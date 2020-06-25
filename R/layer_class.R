@@ -2,9 +2,8 @@
 #' @export
 UNLIMITED <- .Machine$double.xmax
 
-#'
+
 #' Create a layer object.
-#'
 #' @param attachment layer per occurrence attachment point.
 #' @param limit layer per occurrence limit.
 #' @param participation layer participation (proportion ceded).
@@ -16,6 +15,7 @@ UNLIMITED <- .Machine$double.xmax
 #' @export
 #' @examples
 #' layer(4000000, 1000000, 1, "yelt", c("GL", "AUTO"), 0, UNLIMITED)
+#' @import dplyr
 layer <-
   function(limit,
            attachment,
@@ -84,23 +84,41 @@ print.layer <- function(layer) {
   cat("LOBs:\t\t", layer$lobs, "\n")
 }
 
+#' Compute the expected losses ceded to the layer.
+#' @examples
+#' expected(test_layer)
 #' @export
 expected <- function(layer) UseMethod("expected")
+
+#' Compute the standard deviation of losses ceded to the layer.
+#' @examples
+#' stdev(test_layer)
 #' @export
-stdev <-    function(layer) UseMethod("stdev")
+stdev <- function(layer) UseMethod("stdev")
+
+#' Compute value at risk for the losses in the layer.
+#' @examples
+#' VaR(test_layer, 1 - 1/25)
 #' @export
 VaR <- function(layer, ...) UseMethod("VaR")
+
+#' Compute tail value at risk for the losses in the layer.
+#' @examples
+#' tVaR(test_layer, 1 - 1/25)
 #' @export
 tVaR <- function(layer, ...) UseMethod("tVaR")
 
+#' @rdname expected
 #' @export
 expected.layer <- function(layer)
     return(mean(layer$trial_results$ceded_loss))
 
+#' @rdname stdev
 #' @export
 stdev.layer <- function(layer)
     return(sd(layer$trial_results$ceded_loss))
 
+#' @rdname VaR
 #' @export
 VaR.layer <- function(layer, q, type = c("AEP", "OEP")) {
   type = match.arg(type)
@@ -115,6 +133,7 @@ VaR.layer <- function(layer, q, type = c("AEP", "OEP")) {
   return(ans)
 }
 
+#' @rdname tVaR
 #' @export
 tVaR.layer <- function(layer, q) {
   ceded <- layer$trial_results$ceded_loss
