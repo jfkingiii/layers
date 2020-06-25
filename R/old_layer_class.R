@@ -16,18 +16,6 @@ UNLIMITED <- .Machine$double.xmax
 #' @examples
 #' layer(4000000, 1000000, 1, "yelt", c("GL", "AUTO"), 0, UNLIMITED)
 
-# Experimenting:
-# losses <-
-#   get(loss_set) %>% filter(LOB %in% lobs) %>% select(trialID, Loss)
-# losses$ceded_loss <-
-#   pmin(pmax(losses$Loss - attachment, 0), limit) * participation
-# trial_results <-
-#   losses %>% group_by(trialID) %>% summarise(gross_loss = sum(Loss), ceded_loss = sum(ceded_loss), .groups = "drop")
-# trial_results$ceded_loss <-
-#   pmin(pmax(trial_results$ceded_loss - layer$agg_attachment, 0),
-#        layer$agg_limit)
-
-
 layer <-
   function(limit,
            attachment,
@@ -50,6 +38,10 @@ layer <-
       )
     class(value) <- "layer"
     return(value)
+  }
+
+portfolio <- function(layer_list){
+  stopifnot(is.list(layer_list), all(sapply(layer_list, is, "layer")))
   }
 
 

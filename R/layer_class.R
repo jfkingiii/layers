@@ -2,6 +2,7 @@
 #' @export
 UNLIMITED <- .Machine$double.xmax
 
+#'
 #' Create a layer object.
 #'
 #' @param attachment layer per occurrence attachment point.
@@ -15,9 +16,6 @@ UNLIMITED <- .Machine$double.xmax
 #' @export
 #' @examples
 #' layer(4000000, 1000000, 1, "yelt", c("GL", "AUTO"), 0, UNLIMITED)
-
-
-
 layer <-
   function(limit,
            attachment,
@@ -28,7 +26,7 @@ layer <-
            agg_limit = UNLIMITED) {
     valid_lobs <- unique(get(loss_set)$LOB)
     stopifnot(all(lobs %in% valid_lobs))
-#   Experimenting: layer object will now store the trial_results data
+#   Layer object will now store the trial_results data
     losses <-
       get(loss_set) %>% filter(LOB %in% lobs) %>% select(trialID, Loss)
     losses$ceded_loss <-
@@ -52,18 +50,16 @@ layer <-
     return(value)
   }
 
-expected <- function(layer) UseMethod("expected")
-stdev <-    function(layer) UseMethod("stdev")
-VaR <- function(layer, ...) UseMethod("VaR")
-
-expected.layer <- function(a_layer)
-    return(mean(a_layer$trial_results$ceded_loss))
-
-stdev.layer <- function(a_layer)
-    return(sd(a_layer$trial_results$ceded_loss))
-
-VaR.layer <- function(a_layer, q)
-  return(quantile(a_layer$trial_results$ceded_loss, q))
+#' Create a portfolio object.
+#'
+#' @param layer_list a list of layer objects
+#' @return The portfolio object.
+#' @export
+#' @examples
+#' portfolio(list(layer1, layer2, layer3))
+portfolio <- function(layer_list){
+  stopifnot(is.list(layer_list), all(sapply(layer_list, is, "layer")))
+}
 
 #' Print function for objects of class layer.
 #' @examples
@@ -84,10 +80,46 @@ print.layer <- function(layer) {
     cat("Agg Attachment:\t", agg_attachment, "\n")
     cat("Agg Limit:\t", agg_limit, "\n")
   }
-    cat("Loss set:\t", layer$loss_set, "\n")
-    cat("LOBs:\t\t", layer$lobs, "\n")
+  cat("Loss set:\t", layer$loss_set, "\n")
+  cat("LOBs:\t\t", layer$lobs, "\n")
 }
 
+#' @export
+expected <- function(layer) UseMethod("expected")
+#' @export
+stdev <-    function(layer) UseMethod("stdev")
+#' @export
+VaR <- function(layer, ...) UseMethod("VaR")
+#' @export
+tVaR <- function(layer, ...) UseMethod("tVaR")
+
+#' @export
+expected.layer <- function(layer)
+    return(mean(layer$trial_results$ceded_loss))
+
+#' @export
+stdev.layer <- function(layer)
+    return(sd(layer$trial_results$ceded_loss))
+
+#' @export
+VaR.layer <- function(layer, q, type = c("AEP", "OEP")) {
+  type = match.arg(type)
+  if (type == "AEP") {
+    ans <- return(quantile(layer$trial_results$ceded_loss, q))
+  }
+  else {
+    x <- get(layer$loss_set)$Loss
+    y <- pmin(pmax(x - layer$attachment, 0), layer$limit)*layer$participation
+    ans <- quantile(y, q)
+  }
+  return(ans)
+}
+
+#' @export
+tVaR.layer <- function(layer, q) {
+  ceded <- layer$trial_results$ceded_loss
+  return(mean(ceded[ceded > VaR(layer, q)]))
+}
 
 #' Compute a list of metrics for the layer.
 #'
@@ -95,40 +127,28 @@ print.layer <- function(layer) {
 #' @return An object of class metric_list containing mean, standard deviation, VaR and tVaR (AEP).
 #' @export
 #' @examples
-#' layer(4000000, 1000000, 1, "yelt", c("GL", "AUTO"), 0, UNLIMITED)
+#' test_layer <- (4000000, 1000000, 1, "yelt", c("GL", "AUTO"), 0, UNLIMITED)
+#' metrics(layer)
 metrics <- function(layer) {
   UseMethod("metrics")
 }
 
-#' @import dplyr
 #' @rdname metrics
 #' @export
 metrics.layer <- function(layer) {
-  losses <-
-    get(layer$loss_set) %>% filter(LOB %in% layer$lobs) %>% select(trialID, Loss)
-  losses$ceded_loss <-
-    pmin(pmax(losses$Loss - layer$attachment, 0), layer$limit) * layer$participation
-  trial_results <-
-    losses %>% group_by(trialID) %>% summarise(ceded_loss = sum(ceded_loss), .groups = "drop")
-  trial_results$ceded_loss <-
-    pmin(pmax(trial_results$ceded_loss - layer$agg_attachment, 0),
-         layer$agg_limit)
-  ceded <- trial_results$ceded_loss
   ans <- list(
-    mean = mean(ceded),
-    sd = sd(ceded),
-    var25 = quantile(ceded, 1 - 1/25),
-    var100 = quantile(ceded, 1 - 1/100),
-    var250 = quantile(ceded, 1 - 1/250)
+    mean = expected(layer),
+    sd = stdev(layer),
+    var25 = VaR(layer, 1 - 1 / 25),
+    var100 = VaR(layer, 1 - 1 / 100),
+    var250 = VaR(layer, 1 - 1 / 250),
+    tvar25 = tVaR(layer, 1 - 1 / 25),
+    tvar100 = tVaR(layer, 1 - 1 / 100),
+    tvar250 = tVaR(layer, 1 - 1 / 250)
   )
-  tvar25 <- mean(ceded[ceded > ans$var25])
-  tvar100 <- mean(ceded[ceded > ans$var100])
-  tvar250 <- mean(ceded[ceded > ans$var250])
-  ans <- c(ans, tvar25=tvar25, tvar100=tvar100, tvar250=tvar250)
   class(ans) <- "metric_list"
   return(ans)
 }
-
 
 
 #' Print function for objects of class metric_list
@@ -137,13 +157,19 @@ metrics.layer <- function(layer) {
 #' print(metrics(example_layer))
 #' @export
 print.metric_list <- function(x) {
-  z <- lapply(x, function(y) format(round(y), big.mark = ",", scientific = FALSE))
-  cat("Mean:\t\t", z$mean, "\n")
-  cat("StdDev:\t\t", z$sd, "\n")
-  cat("VaR 25:\t\t", z$var25, "\n")
-  cat("VaR 100:\t", z$var100, "\n")
-  cat("VaR 250:\t", z$var250, "\n")
-  cat("tVaR 25:\t", z$tvar25, "\n")
-  cat("tVaR 100:\t", z$tvar100, "\n")
-  cat("tVaR 250:\t", z$tvar250, "\n")
+  z <- sapply(x, function(y) format(round(y), big.mark = ",", scientific = FALSE))
+  names(z) <- NULL
+  print(data.frame(
+    Metric = c(
+      "Mean:",
+      "StdDev:",
+      "VaR 25:",
+      "VaR 100:",
+      "VaR 250:",
+      "tVaR 25:",
+      "tVaR 100:",
+      "tVaR 250:"
+    ),
+    Value = z
+  ), row.names=FALSE)
 }
