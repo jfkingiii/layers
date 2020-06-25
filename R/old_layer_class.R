@@ -16,6 +16,16 @@ UNLIMITED <- .Machine$double.xmax
 #' @examples
 #' layer(4000000, 1000000, 1, "yelt", c("GL", "AUTO"), 0, UNLIMITED)
 
+# Experimenting:
+# losses <-
+#   get(loss_set) %>% filter(LOB %in% lobs) %>% select(trialID, Loss)
+# losses$ceded_loss <-
+#   pmin(pmax(losses$Loss - attachment, 0), limit) * participation
+# trial_results <-
+#   losses %>% group_by(trialID) %>% summarise(gross_loss = sum(Loss), ceded_loss = sum(ceded_loss), .groups = "drop")
+# trial_results$ceded_loss <-
+#   pmin(pmax(trial_results$ceded_loss - layer$agg_attachment, 0),
+#        layer$agg_limit)
 
 
 layer <-
@@ -28,15 +38,6 @@ layer <-
            agg_limit = UNLIMITED) {
     valid_lobs <- unique(get(loss_set)$LOB)
     stopifnot(all(lobs %in% valid_lobs))
-#   Experimenting: layer object will now store the trial_results data
-    losses <-
-      get(loss_set) %>% filter(LOB %in% lobs) %>% select(trialID, Loss)
-    losses$ceded_loss <-
-      pmin(pmax(losses$Loss - attachment, 0), limit) * participation
-    trial_results <-
-      losses %>% group_by(trialID) %>% summarise(ceded_loss = sum(ceded_loss), .groups = "drop")
-    trial_results$ceded_loss <-
-      pmin(pmax(trial_results$ceded_loss - agg_attachment, 0), agg_limit)
     value <-
       list(
         attachment = attachment,
@@ -45,25 +46,12 @@ layer <-
         loss_set = loss_set,
         lobs = lobs,
         agg_attachment = agg_attachment,
-        agg_limit = agg_limit,
-        trial_results = trial_results
+        agg_limit = agg_limit
       )
     class(value) <- "layer"
     return(value)
   }
 
-expected <- function(layer) UseMethod("expected")
-stdev <-    function(layer) UseMethod("stdev")
-VaR <- function(layer, ...) UseMethod("VaR")
-
-expected.layer <- function(a_layer)
-    return(mean(a_layer$trial_results$ceded_loss))
-
-stdev.layer <- function(a_layer)
-    return(sd(a_layer$trial_results$ceded_loss))
-
-VaR.layer <- function(a_layer, q)
-  return(quantile(a_layer$trial_results$ceded_loss, q))
 
 #' Print function for objects of class layer.
 #' @examples
@@ -84,8 +72,9 @@ print.layer <- function(layer) {
     cat("Agg Attachment:\t", agg_attachment, "\n")
     cat("Agg Limit:\t", agg_limit, "\n")
   }
+  if (!is.null(layer$lobs))
     cat("Loss set:\t", layer$loss_set, "\n")
-    cat("LOBs:\t\t", layer$lobs, "\n")
+  cat("LOBs:\t\t", layer$lobs, "\n")
 }
 
 
@@ -128,7 +117,6 @@ metrics.layer <- function(layer) {
   class(ans) <- "metric_list"
   return(ans)
 }
-
 
 
 #' Print function for objects of class metric_list
