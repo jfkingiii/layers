@@ -3,7 +3,7 @@
 \docType{data}
 \name{yelt_test}
 \alias{yelt_test}
-\title{A sample YELT (year event loss table) to test layers functions on.}
+\title{A sample YELT (year event loss table) to test layers functions on}
 \format{
 A data frame with 127648 rows and 5 variables:
 \describe{
@@ -18,6 +18,6 @@ A data frame with 127648 rows and 5 variables:
 yelt_test
 }
 \description{
-A sample YELT (year event loss table) to test layers functions on.
+A sample YELT (year event loss table) to test layers functions on
 }
 \keyword{datasets}
