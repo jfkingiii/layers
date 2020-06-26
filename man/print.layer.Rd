@@ -10,6 +10,7 @@
 Print function for objects of class layer.
 }
 \examples{
+test_layer <- layer(4000000, 1000000, 1, "yelt_test", lobs=c("PHYSICIANS","CHC","MEDCHOICE"))
 test_layer
 print(test_layer)
 }

@@ -18,17 +18,11 @@ knitr::opts_chunk$set(
 <!-- badges: start -->
 <!-- badges: end -->
 
-The goal of layers is to ...
+The goal of layers is to provide a simple library for doing common reinsurance calculations.
 
 ## Installation
 
-You can install the released version of layers from [CRAN](https://CRAN.R-project.org) with:
-
-``` r
-install.packages("layers")
-```
-
-And the development version from [GitHub](https://github.com/) with:
+You can install the released version of `layers` from [GitHub](https://github.com/) with:
 
 ``` r
 # install.packages("devtools")
@@ -36,17 +30,27 @@ devtools::install_github("jfkingiii/layers")
 ```
 ## Example
 
-This is a basic example which shows you how to solve a common problem:
+Use the included sample yelt, `yelt_test` to try out some of the `layers` functions.
 
 ```{r example}
 library(layers)
-## basic example code
+
+# Look at the help files
+help(package=layers)
+
+# Create some layers and get their metrics
+options(scipen = 999)
+test_layer <- layer(4000000, 1000000, 1, "yelt_test", lobs=c("PHYSICIANS","CHC","MEDCHOICE"))
+gross_layer <- layer(UNLIMITED, 0, 1, "yelt_test", lobs=c("PHYSICIANS","CHC","MEDCHOICE","HOSPITAL"))
+test_layer
+gross_layer
+summary(test_layer)
+summary(gross_layer)
+
+# Test some OEPs
+VaR(gross_layer, 1 - 1/25, "OEP")
+VaR(gross_layer, 1 - 1/100, "OEP")
+VaR(test_layer, 1 - 1/100, "OEP")
+VaR(test_layer, 1 - 1/100, "OEP")
 ```
 
-What is special about using `README.Rmd` instead of just `README.md`? You can include R chunks like so:
-
-```{r cars}
-summary(cars)
-```
-
-You'll still need to render `README.Rmd` regularly, to keep `README.md` up-to-date.

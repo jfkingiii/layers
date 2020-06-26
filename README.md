@@ -7,18 +7,13 @@
 
 <!-- badges: end -->
 
-The goal of layers is to …
+The goal of layers is to provide a simple library for doing common
+reinsurance calculations.
 
 ## Installation
 
-You can install the released version of layers from
-[CRAN](https://CRAN.R-project.org) with:
-
-``` r
-install.packages("layers")
-```
-
-And the development version from [GitHub](https://github.com/) with:
+You can install the released version of `layers` from
+[GitHub](https://github.com/) with:
 
 ``` r
 # install.packages("devtools")
@@ -27,26 +22,71 @@ devtools::install_github("jfkingiii/layers")
 
 ## Example
 
-This is a basic example which shows you how to solve a common problem:
+Use the included sample yelt, `yelt_test` to try out some of the
+`layers` functions.
 
 ``` r
 library(layers)
-## basic example code
+
+# Look at the help files
+help(package=layers)
+
+# Create some layers and get their metrics
+options(scipen = 999)
+test_layer <- layer(4000000, 1000000, 1, "yelt_test", lobs=c("PHYSICIANS","CHC","MEDCHOICE"))
+gross_layer <- layer(UNLIMITED, 0, 1, "yelt_test", lobs=c("PHYSICIANS","CHC","MEDCHOICE","HOSPITAL"))
+test_layer
+#> Limit:        4,000,000 
+#> Attachment:   1,000,000 
+#> Participation:    1.000 
+#> Loss set:     yelt_test 
+#> LOBs:         PHYSICIANS CHC MEDCHOICE
+gross_layer
+#> Limit:        UNLIMITED 
+#> Attachment:   0 
+#> Participation:    1.000 
+#> Loss set:     yelt_test 
+#> LOBs:         PHYSICIANS CHC MEDCHOICE HOSPITAL
+summary(test_layer)
+#> Limit:        4,000,000 
+#> Attachment:   1,000,000 
+#> Participation:    1.000 
+#> Loss set:     yelt_test 
+#> LOBs:         PHYSICIANS CHC MEDCHOICE 
+#> 
+#>                Value
+#> Mean:      6,782,625
+#> StdDev:    3,381,071
+#> VaR 25:   13,797,776
+#> VaR 100:  15,897,134
+#> VaR 250:  18,093,981
+#> tVaR 25:  15,582,691
+#> tVaR 100: 17,798,589
+#> tVaR 250: 19,018,259
+summary(gross_layer)
+#> Limit:        UNLIMITED 
+#> Attachment:   0 
+#> Participation:    1.000 
+#> Loss set:     yelt_test 
+#> LOBs:         PHYSICIANS CHC MEDCHOICE HOSPITAL 
+#> 
+#>                 Value
+#> Mean:     102,235,225
+#> StdDev:    16,176,233
+#> VaR 25:   133,856,576
+#> VaR 100:  146,607,414
+#> VaR 250:  152,166,934
+#> tVaR 25:  141,894,334
+#> tVaR 100: 151,802,890
+#> tVaR 250: 154,059,363
+
+# Test some OEPs
+VaR(gross_layer, 1 - 1/25, "OEP")
+#> [1] 1321227
+VaR(gross_layer, 1 - 1/100, "OEP")
+#> [1] 3000000
+VaR(test_layer, 1 - 1/100, "OEP")
+#> [1] 2000000
+VaR(test_layer, 1 - 1/100, "OEP")
+#> [1] 2000000
 ```
-
-What is special about using `README.Rmd` instead of just `README.md`?
-You can include R chunks like so:
-
-``` r
-summary(cars)
-#>      speed           dist       
-#>  Min.   : 4.0   Min.   :  2.00  
-#>  1st Qu.:12.0   1st Qu.: 26.00  
-#>  Median :15.0   Median : 36.00  
-#>  Mean   :15.4   Mean   : 42.98  
-#>  3rd Qu.:19.0   3rd Qu.: 56.00  
-#>  Max.   :25.0   Max.   :120.00
-```
-
-You’ll still need to render `README.Rmd` regularly, to keep `README.md`
-up-to-date.

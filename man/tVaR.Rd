@@ -13,5 +13,6 @@ tVaR(layer, ...)
 Compute tail value at risk for the losses in the layer.
 }
 \examples{
+test_layer <- layer(4000000, 1000000, 1, "yelt_test", lobs=c("PHYSICIANS","CHC","MEDCHOICE"))
 tVaR(test_layer, 1 - 1/25)
 }

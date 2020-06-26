@@ -1,4 +1,16 @@
-#' Convenient synonym for .Machine$double.xmax
+#' A sample YELT (year event loss table) to test layers functions on
+#'
+#' @format A data frame with 127648 rows and 5 variables:
+#' \describe{
+#'   \item{trialID}{Identifier for the trial, which represents one year}
+#'   \item{LOB}{Line of business or other segmentation}
+#'   \item{Loss}{Loss amount}
+#'   \item{Sequence}{Sequence of loss within trial}
+#'
+#' }
+"yelt_test"
+
+#' Convenient synonym for .Machine$double.xmax.
 #' @export
 UNLIMITED <- .Machine$double.xmax
 
@@ -14,7 +26,9 @@ UNLIMITED <- .Machine$double.xmax
 #' @return The layer object.
 #' @export
 #' @examples
-#' layer(4000000, 1000000, 1, "yelt", c("GL", "AUTO"), 0, UNLIMITED)
+#' test_layer <- layer(4000000, 1000000, 1, "yelt_test", lobs=c("PHYSICIANS","CHC","MEDCHOICE"))
+#' agg_layer <- layer(4000000, 1000000, 1, "yelt_test", lobs=c("PHYSICIANS","CHC","MEDCHOICE"),
+#'                    agg_attachment = 4000000, agg_limit=8000000)
 #' @import dplyr
 layer <-
   function(limit,
@@ -63,12 +77,14 @@ portfolio <- function(layer_list){
 
 #' Print function for objects of class layer.
 #' @examples
+#' test_layer <- layer(4000000, 1000000, 1, "yelt_test", lobs=c("PHYSICIANS","CHC","MEDCHOICE"))
 #' test_layer
 #' print(test_layer)
 #' @export
 print.layer <- function(layer) {
   attachment <- format(layer$attachment, big.mark = ",", scientific = FALSE)
-  limit <-  format(layer$limit, big.mark = ",", scientific = FALSE)
+  if (layer$limit == UNLIMITED) limit <- "UNLIMITED"
+  else limit <-  format(layer$limit, big.mark = ",", scientific = FALSE)
   participation <- format(layer$participation, nsmall=3, format="f")
   cat("Limit:\t\t", limit, "\n")
   cat("Attachment:\t", attachment, "\n")
@@ -86,24 +102,33 @@ print.layer <- function(layer) {
 
 #' Compute the expected losses ceded to the layer.
 #' @examples
+#' test_layer <- layer(4000000, 1000000, 1, "yelt_test", lobs=c("PHYSICIANS","CHC","MEDCHOICE"))
 #' expected(test_layer)
 #' @export
 expected <- function(layer) UseMethod("expected")
 
 #' Compute the standard deviation of losses ceded to the layer.
 #' @examples
+#' test_layer <- layer(4000000, 1000000, 1, "yelt_test", lobs=c("PHYSICIANS","CHC","MEDCHOICE"))
 #' stdev(test_layer)
 #' @export
 stdev <- function(layer) UseMethod("stdev")
 
 #' Compute value at risk for the losses in the layer.
+#' @param layer the layer to computer VaR with.
+#' @param q Quantile for VaR. For example, if the return period is 100 years, q = 1 - 1/100.
+#' @param type AEP (aggregate exceedance probability)or OEP (occurrence exceedance probability). Defaults to AEP.
 #' @examples
+#' test_layer <- layer(4000000, 1000000, 1, "yelt_test", lobs=c("PHYSICIANS","CHC","MEDCHOICE"))
 #' VaR(test_layer, 1 - 1/25)
+#' VaR(test_layer, 1 - 1/25, "AEP") # the same thing
+#' VaR(test_layer, 1 - 1/25, "OEP")
 #' @export
 VaR <- function(layer, ...) UseMethod("VaR")
 
 #' Compute tail value at risk for the losses in the layer.
 #' @examples
+#' test_layer <- layer(4000000, 1000000, 1, "yelt_test", lobs=c("PHYSICIANS","CHC","MEDCHOICE"))
 #' tVaR(test_layer, 1 - 1/25)
 #' @export
 tVaR <- function(layer, ...) UseMethod("tVaR")
@@ -130,32 +155,29 @@ VaR.layer <- function(layer, q, type = c("AEP", "OEP")) {
     y <- pmin(pmax(x - layer$attachment, 0), layer$limit)*layer$participation
     ans <- quantile(y, q)
   }
-  return(ans)
+  return(unname(ans))
 }
 
 #' @rdname tVaR
 #' @export
 tVaR.layer <- function(layer, q) {
   ceded <- layer$trial_results$ceded_loss
-  return(mean(ceded[ceded > VaR(layer, q)]))
+  ans <- mean(ceded[ceded >= VaR(layer, q)])
+  return(unname(ans))
 }
 
-#' Compute a list of metrics for the layer.
-#'
+#'  Summarize the layer parameters, and compute some metrics
+#'  for the layer.
 #' @param layer The layer to calculate metrics for.
-#' @return An object of class metric_list containing mean, standard deviation, VaR and tVaR (AEP).
+#' @return An object of class summary.layer containing layer parameters, mean,
+#' standard deviation, VaR and tVaR (AEP).
 #' @export
 #' @examples
-#' test_layer <- (4000000, 1000000, 1, "yelt", c("GL", "AUTO"), 0, UNLIMITED)
-#' metrics(layer)
-metrics <- function(layer) {
-  UseMethod("metrics")
-}
-
-#' @rdname metrics
+#' test_layer <- layer(4000000, 1000000, 1, "yelt_test", lobs=c("PHYSICIANS","CHC","MEDCHOICE"))
+#' summary(test_layer)
 #' @export
-metrics.layer <- function(layer) {
-  ans <- list(
+summary.layer <- function(layer) {
+  ans <- list(layer = layer,
     mean = expected(layer),
     sd = stdev(layer),
     var25 = VaR(layer, 1 - 1 / 25),
@@ -165,21 +187,24 @@ metrics.layer <- function(layer) {
     tvar100 = tVaR(layer, 1 - 1 / 100),
     tvar250 = tVaR(layer, 1 - 1 / 250)
   )
-  class(ans) <- "metric_list"
+  class(ans) <- "summary.layer"
   return(ans)
 }
 
 
 #' Print function for objects of class metric_list
 #' @examples
-#' metrics(example_layer)
-#' print(metrics(example_layer))
+#' test_layer <- layer(4000000, 1000000, 1, "yelt_test", lobs=c("PHYSICIANS","CHC","MEDCHOICE"))
+#' summary(test_layer)
+#' print(summary(test_layer)) # same thing
 #' @export
-print.metric_list <- function(x) {
-  z <- sapply(x, function(y) format(round(y), big.mark = ",", scientific = FALSE))
+print.summary.layer <- function(x) {
+  print(x$layer)
+  cat("\n")
+  z <- sapply(x[-1], function(y) format(round(y), big.mark = ",", scientific = FALSE))
   names(z) <- NULL
   print(data.frame(
-    Metric = c(
+    row.names = c(
       "Mean:",
       "StdDev:",
       "VaR 25:",
@@ -190,5 +215,5 @@ print.metric_list <- function(x) {
       "tVaR 250:"
     ),
     Value = z
-  ), row.names=FALSE)
+  ))
 }

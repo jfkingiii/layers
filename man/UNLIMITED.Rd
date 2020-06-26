@@ -3,7 +3,7 @@
 \docType{data}
 \name{UNLIMITED}
 \alias{UNLIMITED}
-\title{Convenient synonym for .Machine$double.xmax}
+\title{Convenient synonym for .Machine$double.xmax.}
 \format{
 An object of class \code{numeric} of length 1.
 }
@@ -11,6 +11,6 @@ An object of class \code{numeric} of length 1.
 UNLIMITED
 }
 \description{
-Convenient synonym for .Machine$double.xmax
+Convenient synonym for .Machine$double.xmax.
 }
 \keyword{datasets}

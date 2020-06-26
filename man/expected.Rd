@@ -13,5 +13,6 @@ expected(layer)
 Compute the expected losses ceded to the layer.
 }
 \examples{
+test_layer <- layer(4000000, 1000000, 1, "yelt_test", lobs=c("PHYSICIANS","CHC","MEDCHOICE"))
 expected(test_layer)
 }

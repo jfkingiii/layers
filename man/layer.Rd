@@ -36,5 +36,7 @@ The layer object.
 Create a layer object.
 }
 \examples{
-layer(4000000, 1000000, 1, "yelt", c("GL", "AUTO"), 0, UNLIMITED)
+test_layer <- layer(4000000, 1000000, 1, "yelt_test", lobs=c("PHYSICIANS","CHC","MEDCHOICE"))
+agg_layer <- layer(4000000, 1000000, 1, "yelt_test", lobs=c("PHYSICIANS","CHC","MEDCHOICE"),
+                   agg_attachment = 4000000, agg_limit=8000000)
 }

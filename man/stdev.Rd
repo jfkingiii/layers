@@ -13,5 +13,6 @@ stdev(layer)
 Compute the standard deviation of losses ceded to the layer.
 }
 \examples{
+test_layer <- layer(4000000, 1000000, 1, "yelt_test", lobs=c("PHYSICIANS","CHC","MEDCHOICE"))
 stdev(test_layer)
 }
