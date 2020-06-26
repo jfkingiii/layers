@@ -1,3 +1,7 @@
+#' @import dplyr
+#' @importFrom stats quantile sd
+NULL
+
 #' A sample YELT (year event loss table) to test layers functions on
 #'
 #' @format A data frame with 127648 rows and 5 variables:
@@ -29,7 +33,6 @@ UNLIMITED <- .Machine$double.xmax
 #' test_layer <- layer(4000000, 1000000, 1, "yelt_test", lobs=c("PHYSICIANS","CHC","MEDCHOICE"))
 #' agg_layer <- layer(4000000, 1000000, 1, "yelt_test", lobs=c("PHYSICIANS","CHC","MEDCHOICE"),
 #'                    agg_attachment = 4000000, agg_limit=8000000)
-#' @import dplyr
 layer <-
   function(limit,
            attachment,
@@ -72,35 +75,39 @@ layer <-
 #' @examples
 #' portfolio(list(layer1, layer2, layer3))
 portfolio <- function(layer_list){
-  stopifnot(is.list(layer_list), all(sapply(layer_list, is, "layer")))
+#   stopifnot(is.list(layer_list), all(sapply(layer_list, is, "layer")))
+  return(NULL)
 }
 
 #' Print function for objects of class layer.
+#' @param x The layer to be printed.
+#' @param ... Objects to be passed to subsequent methods, if they existed.
 #' @examples
 #' test_layer <- layer(4000000, 1000000, 1, "yelt_test", lobs=c("PHYSICIANS","CHC","MEDCHOICE"))
 #' test_layer
 #' print(test_layer)
 #' @export
-print.layer <- function(layer) {
-  attachment <- format(layer$attachment, big.mark = ",", scientific = FALSE)
-  if (layer$limit == UNLIMITED) limit <- "UNLIMITED"
-  else limit <-  format(layer$limit, big.mark = ",", scientific = FALSE)
-  participation <- format(layer$participation, nsmall=3, format="f")
+print.layer <- function(x, ...) {
+  attachment <- format(x$attachment, big.mark = ",", scientific = FALSE)
+  if (x$limit == UNLIMITED) limit <- "UNLIMITED"
+  else limit <-  format(x$limit, big.mark = ",", scientific = FALSE)
+  participation <- format(x$participation, nsmall=3, format="f")
   cat("Limit:\t\t", limit, "\n")
   cat("Attachment:\t", attachment, "\n")
   cat("Participation:\t", participation, "\n")
-  if (layer$agg_attachment != 0 | layer$agg_limit != UNLIMITED)
+  if (x$agg_attachment != 0 | x$agg_limit != UNLIMITED)
   {
-    agg_attachment <- format(layer$agg_attachment, big.mark = ",", scientific = FALSE)
-    agg_limit <-  format(layer$agg_limit, big.mark = ",", scientific = FALSE)
+    agg_attachment <- format(x$agg_attachment, big.mark = ",", scientific = FALSE)
+    agg_limit <-  format(x$agg_limit, big.mark = ",", scientific = FALSE)
     cat("Agg Attachment:\t", agg_attachment, "\n")
     cat("Agg Limit:\t", agg_limit, "\n")
   }
-  cat("Loss set:\t", layer$loss_set, "\n")
-  cat("LOBs:\t\t", layer$lobs, "\n")
+  cat("Loss set:\t", x$loss_set, "\n")
+  cat("LOBs:\t\t", x$lobs, "\n")
 }
 
 #' Compute the expected losses ceded to the layer.
+#' @param layer the layer to compute the expectation of
 #' @examples
 #' test_layer <- layer(4000000, 1000000, 1, "yelt_test", lobs=c("PHYSICIANS","CHC","MEDCHOICE"))
 #' expected(test_layer)
@@ -108,6 +115,7 @@ print.layer <- function(layer) {
 expected <- function(layer) UseMethod("expected")
 
 #' Compute the standard deviation of losses ceded to the layer.
+#' @param layer the layer to compute the standard deviation of
 #' @examples
 #' test_layer <- layer(4000000, 1000000, 1, "yelt_test", lobs=c("PHYSICIANS","CHC","MEDCHOICE"))
 #' stdev(test_layer)
@@ -124,14 +132,16 @@ stdev <- function(layer) UseMethod("stdev")
 #' VaR(test_layer, 1 - 1/25, "AEP") # the same thing
 #' VaR(test_layer, 1 - 1/25, "OEP")
 #' @export
-VaR <- function(layer, ...) UseMethod("VaR")
+VaR <- function(layer, q, type = c("AEP", "OEP")) UseMethod("VaR")
 
 #' Compute tail value at risk for the losses in the layer.
+#' @param layer the layer to computer tVaR with.
+#' @param q Quantile for tVaR. For example, if the return period is 100 years, q = 1 - 1/100.
 #' @examples
 #' test_layer <- layer(4000000, 1000000, 1, "yelt_test", lobs=c("PHYSICIANS","CHC","MEDCHOICE"))
 #' tVaR(test_layer, 1 - 1/25)
 #' @export
-tVaR <- function(layer, ...) UseMethod("tVaR")
+tVaR <- function(layer, q) UseMethod("tVaR")
 
 #' @rdname expected
 #' @export
@@ -168,7 +178,8 @@ tVaR.layer <- function(layer, q) {
 
 #'  Summarize the layer parameters, and compute some metrics
 #'  for the layer.
-#' @param layer The layer to calculate metrics for.
+#' @param object The layer to calculate metrics for.
+#' @param ... Objects to be passed to subsequent methods, if they existed.
 #' @return An object of class summary.layer containing layer parameters, mean,
 #' standard deviation, VaR and tVaR (AEP).
 #' @export
@@ -176,29 +187,31 @@ tVaR.layer <- function(layer, q) {
 #' test_layer <- layer(4000000, 1000000, 1, "yelt_test", lobs=c("PHYSICIANS","CHC","MEDCHOICE"))
 #' summary(test_layer)
 #' @export
-summary.layer <- function(layer) {
-  ans <- list(layer = layer,
-    mean = expected(layer),
-    sd = stdev(layer),
-    var25 = VaR(layer, 1 - 1 / 25),
-    var100 = VaR(layer, 1 - 1 / 100),
-    var250 = VaR(layer, 1 - 1 / 250),
-    tvar25 = tVaR(layer, 1 - 1 / 25),
-    tvar100 = tVaR(layer, 1 - 1 / 100),
-    tvar250 = tVaR(layer, 1 - 1 / 250)
+summary.layer <- function(object, ...) {
+  ans <- list(layer = object,
+    mean = expected(object),
+    sd = stdev(object),
+    var25 = VaR(object, 1 - 1 / 25),
+    var100 = VaR(object, 1 - 1 / 100),
+    var250 = VaR(object, 1 - 1 / 250),
+    tvar25 = tVaR(object, 1 - 1 / 25),
+    tvar100 = tVaR(object, 1 - 1 / 100),
+    tvar250 = tVaR(object, 1 - 1 / 250)
   )
   class(ans) <- "summary.layer"
   return(ans)
 }
 
 
-#' Print function for objects of class metric_list
+#' Print function for objects of class summary.layer
+#' @param x The summary to be printed.
+#' @param ... Objects to be passed to subsequent methods, if they existed.
 #' @examples
 #' test_layer <- layer(4000000, 1000000, 1, "yelt_test", lobs=c("PHYSICIANS","CHC","MEDCHOICE"))
 #' summary(test_layer)
 #' print(summary(test_layer)) # same thing
 #' @export
-print.summary.layer <- function(x) {
+print.summary.layer <- function(x, ...) {
   print(x$layer)
   cat("\n")
   z <- sapply(x[-1], function(y) format(round(y), big.mark = ",", scientific = FALSE))

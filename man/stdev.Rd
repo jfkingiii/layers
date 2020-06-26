@@ -9,6 +9,9 @@ stdev(layer)
 
 \method{stdev}{layer}(layer)
 }
+\arguments{
+\item{layer}{the layer to compute the standard deviation of}
+}
 \description{
 Compute the standard deviation of losses ceded to the layer.
 }

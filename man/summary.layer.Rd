@@ -5,10 +5,12 @@
 \title{Summarize the layer parameters, and compute some metrics
 for the layer.}
 \usage{
-\method{summary}{layer}(layer)
+\method{summary}{layer}(object, ...)
 }
 \arguments{
-\item{layer}{The layer to calculate metrics for.}
+\item{object}{The layer to calculate metrics for.}
+
+\item{...}{Objects to be passed to subsequent methods, if they existed.}
 }
 \value{
 An object of class summary.layer containing layer parameters, mean,

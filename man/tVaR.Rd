@@ -5,9 +5,14 @@
 \alias{tVaR.layer}
 \title{Compute tail value at risk for the losses in the layer.}
 \usage{
-tVaR(layer, ...)
+tVaR(layer, q)
 
 \method{tVaR}{layer}(layer, q)
+}
+\arguments{
+\item{layer}{the layer to computer tVaR with.}
+
+\item{q}{Quantile for tVaR. For example, if the return period is 100 years, q = 1 - 1/100.}
 }
 \description{
 Compute tail value at risk for the losses in the layer.

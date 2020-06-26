@@ -9,6 +9,9 @@ expected(layer)
 
 \method{expected}{layer}(layer)
 }
+\arguments{
+\item{layer}{the layer to compute the expectation of}
+}
 \description{
 Compute the expected losses ceded to the layer.
 }

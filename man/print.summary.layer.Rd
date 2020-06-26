@@ -2,12 +2,17 @@
 % Please edit documentation in R/layer_class.R
 \name{print.summary.layer}
 \alias{print.summary.layer}
-\title{Print function for objects of class metric_list}
+\title{Print function for objects of class summary.layer}
 \usage{
-\method{print}{summary.layer}(x)
+\method{print}{summary.layer}(x, ...)
+}
+\arguments{
+\item{x}{The summary to be printed.}
+
+\item{...}{Objects to be passed to subsequent methods, if they existed.}
 }
 \description{
-Print function for objects of class metric_list
+Print function for objects of class summary.layer
 }
 \examples{
 test_layer <- layer(4000000, 1000000, 1, "yelt_test", lobs=c("PHYSICIANS","CHC","MEDCHOICE"))

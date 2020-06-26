@@ -1,5 +1,7 @@
 library(layers)
 
+print("running test")
+
 test_layer <- layer(4000000, 1000000, 1, "yelt_test", lobs=c("PHYSICIANS","CHC","MEDCHOICE"))
 gross_layer <- layer(UNLIMITED, 0, 1, "yelt_test", lobs=c("PHYSICIANS","CHC","MEDCHOICE","HOSPITAL"))
 agg_layer <- layer(4000000, 1000000, 1, "yelt_test", lobs=c("PHYSICIANS","CHC","MEDCHOICE"),
@@ -11,3 +13,5 @@ test_that("expected is accurate", {
   expect_equal(trunc(expected(gross_layer)), 102235224)
   expect_equal(trunc(expected(agg_layer)), 3037403)
 })
+
+print("test complete")

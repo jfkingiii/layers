@@ -5,7 +5,7 @@
 \alias{VaR.layer}
 \title{Compute value at risk for the losses in the layer.}
 \usage{
-VaR(layer, ...)
+VaR(layer, q, type = c("AEP", "OEP"))
 
 \method{VaR}{layer}(layer, q, type = c("AEP", "OEP"))
 }
