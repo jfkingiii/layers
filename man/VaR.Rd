@@ -5,14 +5,14 @@
 \alias{VaR.layer}
 \title{Compute value at risk for the losses in the layer.}
 \usage{
-VaR(layer, q, type = c("AEP", "OEP"))
+VaR(layer, rp_years, type = c("AEP", "OEP"))
 
-\method{VaR}{layer}(layer, q, type = c("AEP", "OEP"))
+\method{VaR}{layer}(layer, rp_years, type = c("AEP", "OEP"))
 }
 \arguments{
 \item{layer}{the layer to computer VaR with.}
 
-\item{q}{Quantile for VaR. For example, if the return period is 100 years, q = 1 - 1/100.}
+\item{rp_years}{Number of years in the return period}
 
 \item{type}{AEP (aggregate exceedance probability)or OEP (occurrence exceedance probability). Defaults to AEP.}
 }
@@ -20,8 +20,8 @@ VaR(layer, q, type = c("AEP", "OEP"))
 Compute value at risk for the losses in the layer.
 }
 \examples{
-test_layer <- layer(4000000, 1000000, 1, "yelt_test", lobs=c("PHYSICIANS","CHC","MEDCHOICE"))
-VaR(test_layer, 1 - 1/25)
-VaR(test_layer, 1 - 1/25, "AEP") # the same thing
-VaR(test_layer, 1 - 1/25, "OEP")
+gross_layer <- layer(UNLIMITED, 0, 1, "yelt_test", lobs=c("PHYSICIANS","CHC","MEDCHOICE"))
+VaR(gross_layer, 25)
+VaR(gross_layer, 25, "AEP") # the same thing
+VaR(gross_layer, 25, "OEP")
 }

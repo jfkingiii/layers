@@ -5,19 +5,23 @@
 \alias{tVaR.layer}
 \title{Compute tail value at risk for the losses in the layer.}
 \usage{
-tVaR(layer, q)
+tVaR(layer, rp_years, type = c("AEP", "OEP"))
 
-\method{tVaR}{layer}(layer, q)
+\method{tVaR}{layer}(layer, rp_years, type = c("AEP", "OEP"))
 }
 \arguments{
-\item{layer}{the layer to computer tVaR with.}
+\item{layer}{the layer to computer VaR with.}
 
-\item{q}{Quantile for tVaR. For example, if the return period is 100 years, q = 1 - 1/100.}
+\item{rp_years}{Number of years in the return period}
+
+\item{type}{AEP (aggregate exceedance probability)or OEP (occurrence exceedance probability). Defaults to AEP.}
 }
 \description{
 Compute tail value at risk for the losses in the layer.
 }
 \examples{
-test_layer <- layer(4000000, 1000000, 1, "yelt_test", lobs=c("PHYSICIANS","CHC","MEDCHOICE"))
-tVaR(test_layer, 1 - 1/25)
+gross_layer <- layer(UNLIMITED, 0, 1, "yelt_test", lobs=c("PHYSICIANS","CHC","MEDCHOICE"))
+tVaR(gross_layer, 25)
+tVaR(gross_layer, 25, "AEP") # the same thing
+tVaR(gross_layer, 25, "OEP")
 }

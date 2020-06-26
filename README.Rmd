@@ -37,7 +37,7 @@ Use the included sample yelt, `yelt_test` to try out some of the `layers` functi
 library(layers)
 
 # Look at the help files
-help(package=layers)
+help(package = layers)
 
 # Create some layers and get their metrics
 options(scipen = 999)
@@ -53,10 +53,10 @@ summary(test_layer)
 summary(gross_layer)
 
 # Test some OEPs
-VaR(gross_layer, 1 - 1/25, "OEP")
-VaR(gross_layer, 1 - 1/100, "OEP")
-VaR(test_layer, 1 - 1/100, "OEP")
-VaR(test_layer, 1 - 1/100, "OEP")
+VaR(gross_layer, 5, "OEP")
+VaR(gross_layer, 10, "OEP")
+VaR(test_layer, 15, "OEP")
+VaR(test_layer, 20, "OEP")
 
 # Try a layer with aggregate parameters
 agg_layer <- layer(4000000, 1000000, 1, "yelt_test", lobs=c("PHYSICIANS","CHC","MEDCHOICE"),

@@ -14,4 +14,17 @@ test_that("expected is accurate", {
   expect_equal(trunc(expected(agg_layer)), 3037403)
 })
 
+test_that("standard deviation is accurate", {
+  expect_equal(trunc(stdev(test_layer)), 3381071)
+  expect_equal(trunc(stdev(gross_layer)), 16176233)
+  expect_equal(trunc(stdev(agg_layer)), 2995537)
+})
+
+test_that("AEP VaR is accurate", {
+  expect_equal(trunc(VaR(test_layer, 5, "AEP")), 9450220)
+  expect_equal(trunc(VaR(gross_layer, 25, "AEP")), 134029327)
+  expect_equal(trunc(VaR(agg_layer, 50, "AEP")), 11141487)
+})
+
+
 print("test complete")

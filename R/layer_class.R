@@ -43,13 +43,17 @@ layer <-
            agg_limit = UNLIMITED) {
     valid_lobs <- unique(get(loss_set)$LOB)
     stopifnot(all(lobs %in% valid_lobs))
-#   Layer object will now store the trial_results data
+    # Layer object will now store the trial_results data
     losses <-
       get(loss_set) %>% filter(LOB %in% lobs) %>% select(trialID, Loss)
-    losses$ceded_loss <-
+    losses$layered_loss <-
       pmin(pmax(losses$Loss - attachment, 0), limit) * participation
     trial_results <-
-      losses %>% group_by(trialID) %>% summarise(ceded_loss = sum(ceded_loss), .groups = "drop")
+      losses %>% group_by(trialID) %>% summarise(
+        ceded_loss = sum(layered_loss),
+        max_ceded_loss = max(layered_loss),
+        .groups = "drop"
+      )
     trial_results$ceded_loss <-
       pmin(pmax(trial_results$ceded_loss - agg_attachment, 0), agg_limit)
     value <-
@@ -124,24 +128,27 @@ stdev <- function(layer) UseMethod("stdev")
 
 #' Compute value at risk for the losses in the layer.
 #' @param layer the layer to computer VaR with.
-#' @param q Quantile for VaR. For example, if the return period is 100 years, q = 1 - 1/100.
+#' @param rp_years Number of years in the return period
 #' @param type AEP (aggregate exceedance probability)or OEP (occurrence exceedance probability). Defaults to AEP.
 #' @examples
-#' test_layer <- layer(4000000, 1000000, 1, "yelt_test", lobs=c("PHYSICIANS","CHC","MEDCHOICE"))
-#' VaR(test_layer, 1 - 1/25)
-#' VaR(test_layer, 1 - 1/25, "AEP") # the same thing
-#' VaR(test_layer, 1 - 1/25, "OEP")
+#' gross_layer <- layer(UNLIMITED, 0, 1, "yelt_test", lobs=c("PHYSICIANS","CHC","MEDCHOICE"))
+#' VaR(gross_layer, 25)
+#' VaR(gross_layer, 25, "AEP") # the same thing
+#' VaR(gross_layer, 25, "OEP")
 #' @export
-VaR <- function(layer, q, type = c("AEP", "OEP")) UseMethod("VaR")
+VaR <- function(layer, rp_years, type = c("AEP", "OEP")) UseMethod("VaR")
 
 #' Compute tail value at risk for the losses in the layer.
-#' @param layer the layer to computer tVaR with.
-#' @param q Quantile for tVaR. For example, if the return period is 100 years, q = 1 - 1/100.
+#' @param layer the layer to computer VaR with.
+#' @param rp_years Number of years in the return period
+#' @param type AEP (aggregate exceedance probability)or OEP (occurrence exceedance probability). Defaults to AEP.
 #' @examples
-#' test_layer <- layer(4000000, 1000000, 1, "yelt_test", lobs=c("PHYSICIANS","CHC","MEDCHOICE"))
-#' tVaR(test_layer, 1 - 1/25)
+#' gross_layer <- layer(UNLIMITED, 0, 1, "yelt_test", lobs=c("PHYSICIANS","CHC","MEDCHOICE"))
+#' tVaR(gross_layer, 25)
+#' tVaR(gross_layer, 25, "AEP") # the same thing
+#' tVaR(gross_layer, 25, "OEP")
 #' @export
-tVaR <- function(layer, q) UseMethod("tVaR")
+tVaR <- function(layer, rp_years, type = c("AEP", "OEP")) UseMethod("tVaR")
 
 #' @rdname expected
 #' @export
@@ -155,24 +162,32 @@ stdev.layer <- function(layer)
 
 #' @rdname VaR
 #' @export
-VaR.layer <- function(layer, q, type = c("AEP", "OEP")) {
+VaR.layer <- function(layer, rp_years, type = c("AEP", "OEP")) {
   type = match.arg(type)
   if (type == "AEP") {
-    ans <- return(quantile(layer$trial_results$ceded_loss, q))
+    aep_sort <- sort(layer$trial_results$ceded_loss, decreasing = TRUE)
+    ans <- aep_sort[nrow(layer$trial_results)/rp_years]
   }
-  else {
-    x <- get(layer$loss_set)$Loss
-    y <- pmin(pmax(x - layer$attachment, 0), layer$limit)*layer$participation
-    ans <- quantile(y, q)
+  else if (type == "OEP") {
+    oep_sort <- sort(layer$trial_results$max_ceded_loss, decreasing = TRUE)
+    ans <- oep_sort[nrow(layer$trial_results)/rp_years]
   }
   return(unname(ans))
 }
 
 #' @rdname tVaR
 #' @export
-tVaR.layer <- function(layer, q) {
-  ceded <- layer$trial_results$ceded_loss
-  ans <- mean(ceded[ceded >= VaR(layer, q)])
+tVaR.layer <- function(layer, rp_years, type = c("AEP", "OEP")) {
+  type = match.arg(type)
+  v <- VaR(layer = layer, rp_years = rp_years, type = type)
+  if (type == "AEP") {
+    aep <- layer$trial_results$ceded_loss
+    ans <- mean(aep[aep >= v])
+  }
+  else if (type == "OEP") {
+    oep <- layer$trial_results$max_ceded_loss
+    ans <- mean(oep[oep >= v])
+  }
   return(unname(ans))
 }
 
@@ -191,12 +206,12 @@ summary.layer <- function(object, ...) {
   ans <- list(layer = object,
     mean = expected(object),
     sd = stdev(object),
-    var25 = VaR(object, 1 - 1 / 25),
-    var100 = VaR(object, 1 - 1 / 100),
-    var250 = VaR(object, 1 - 1 / 250),
-    tvar25 = tVaR(object, 1 - 1 / 25),
-    tvar100 = tVaR(object, 1 - 1 / 100),
-    tvar250 = tVaR(object, 1 - 1 / 250)
+    var25 = VaR(object, 25, "AEP"),
+    var100 = VaR(object, 100, "AEP"),
+    var250 = VaR(object, 250, "AEP"),
+    tvar25 = tVaR(object, 25, "AEP"),
+    tvar100 = tVaR(object, 100, "AEP"),
+    tvar250 = tVaR(object, 250, "AEP")
   )
   class(ans) <- "summary.layer"
   return(ans)
