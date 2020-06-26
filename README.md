@@ -35,18 +35,21 @@ help(package=layers)
 options(scipen = 999)
 test_layer <- layer(4000000, 1000000, 1, "yelt_test", lobs=c("PHYSICIANS","CHC","MEDCHOICE"))
 gross_layer <- layer(UNLIMITED, 0, 1, "yelt_test", lobs=c("PHYSICIANS","CHC","MEDCHOICE","HOSPITAL"))
+# Aggregate limits and deductibles are optional and default to UNLIMITED and 0.
 test_layer
 #> Limit:        4,000,000 
 #> Attachment:   1,000,000 
 #> Participation:    1.000 
 #> Loss set:     yelt_test 
 #> LOBs:         PHYSICIANS CHC MEDCHOICE
+
 gross_layer
 #> Limit:        UNLIMITED 
 #> Attachment:   0 
 #> Participation:    1.000 
 #> Loss set:     yelt_test 
 #> LOBs:         PHYSICIANS CHC MEDCHOICE HOSPITAL
+
 summary(test_layer)
 #> Limit:        4,000,000 
 #> Attachment:   1,000,000 
@@ -63,6 +66,7 @@ summary(test_layer)
 #> tVaR 25:  15,582,691
 #> tVaR 100: 17,798,589
 #> tVaR 250: 19,018,259
+
 summary(gross_layer)
 #> Limit:        UNLIMITED 
 #> Attachment:   0 
@@ -89,4 +93,26 @@ VaR(test_layer, 1 - 1/100, "OEP")
 #> [1] 2000000
 VaR(test_layer, 1 - 1/100, "OEP")
 #> [1] 2000000
+
+# Try a layer with aggregate parameters
+agg_layer <- layer(4000000, 1000000, 1, "yelt_test", lobs=c("PHYSICIANS","CHC","MEDCHOICE"),
+                   agg_attachment = 4000000, agg_limit = 12000000)
+summary(agg_layer)
+#> Limit:        4,000,000 
+#> Attachment:   1,000,000 
+#> Participation:    1.000 
+#> Agg Attachment:   4,000,000 
+#> Agg Limit:    12,000,000 
+#> Loss set:     yelt_test 
+#> LOBs:         PHYSICIANS CHC MEDCHOICE 
+#> 
+#>                Value
+#> Mean:      3,037,403
+#> StdDev:    2,995,537
+#> VaR 25:    9,797,776
+#> VaR 100:  11,896,641
+#> VaR 250:  12,000,000
+#> tVaR 25:  11,133,044
+#> tVaR 100: 12,000,000
+#> tVaR 250: 12,000,000
 ```

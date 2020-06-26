@@ -42,9 +42,13 @@ help(package=layers)
 options(scipen = 999)
 test_layer <- layer(4000000, 1000000, 1, "yelt_test", lobs=c("PHYSICIANS","CHC","MEDCHOICE"))
 gross_layer <- layer(UNLIMITED, 0, 1, "yelt_test", lobs=c("PHYSICIANS","CHC","MEDCHOICE","HOSPITAL"))
+# Aggregate limits and deductibles are optional and default to UNLIMITED and 0.
 test_layer
+
 gross_layer
+
 summary(test_layer)
+
 summary(gross_layer)
 
 # Test some OEPs
@@ -52,5 +56,10 @@ VaR(gross_layer, 1 - 1/25, "OEP")
 VaR(gross_layer, 1 - 1/100, "OEP")
 VaR(test_layer, 1 - 1/100, "OEP")
 VaR(test_layer, 1 - 1/100, "OEP")
+
+# Try a layer with aggregate parameters
+agg_layer <- layer(4000000, 1000000, 1, "yelt_test", lobs=c("PHYSICIANS","CHC","MEDCHOICE"),
+                   agg_attachment = 4000000, agg_limit = 12000000)
+summary(agg_layer)
 ```
 
