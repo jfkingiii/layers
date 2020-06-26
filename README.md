@@ -8,7 +8,9 @@
 <!-- badges: end -->
 
 The goal of layers is to provide a simple library for doing common
-reinsurance calculations outside of Analyze Re. \#\# Installation
+reinsurance calculations outside of Analyze Re.
+
+## Installation
 
 You can install the development version of `layers` from
 [GitHub](https://github.com/) with:
