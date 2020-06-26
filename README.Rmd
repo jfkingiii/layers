@@ -16,6 +16,7 @@ knitr::opts_chunk$set(
 # layers
 
 <!-- badges: start -->
+[![Lifecycle: maturing](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://www.tidyverse.org/lifecycle/#experimental)
 <!-- badges: end -->
 
 The goal of layers is to provide a simple library for doing common reinsurance calculations outside of Analyze Re.
@@ -62,4 +63,3 @@ agg_layer <- layer(4000000, 1000000, 1, "yelt_test", lobs=c("PHYSICIANS","CHC","
                    agg_attachment = 4000000, agg_limit = 12000000)
 summary(agg_layer)
 ```
-
