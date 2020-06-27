@@ -93,6 +93,7 @@ portfolio <- function(...){
 #' test_layer <- layer(4000000, 1000000, 1, "yelt_test", lobs=c("PHYSICIANS","CHC","MEDCHOICE"))
 #' test_layer
 #' print(test_layer)
+#' @export print.layer
 #' @export
 print.layer <- function(x, ...) {
   attachment <- format(x$attachment, big.mark = ",", scientific = FALSE)
@@ -122,6 +123,7 @@ print.layer <- function(x, ...) {
 #' P <- portfolio(layer1, layer2)
 #' P
 #' print(P)
+#' @export print.portfolio
 #' @export
 print.portfolio <- function(x, ...){
   invisible(sapply(x, function(y) {print(y); cat("\n")}))
@@ -168,27 +170,32 @@ VaR <- function(layer, rp_years, type = c("AEP", "OEP")) UseMethod("VaR")
 tVaR <- function(layer, rp_years, type = c("AEP", "OEP")) UseMethod("tVaR")
 
 #' @rdname expected
+#' @export expected.layer
 #' @export
 expected.layer <- function(object)
     return(mean(object$trial_results$ceded_loss))
 
 #' @rdname expected
+#' @export expected.portfolio
 #' @export
 expected.portfolio <- function(object)
   return(sum(sapply(object, expected.layer)))
 
 #' @rdname stdev
+#' @export stdev.layer
 #' @export
 stdev.layer <- function(object)
     return(sd(object$trial_results$ceded_loss))
 
 #' @rdname stdev
+#' @export stdev.portfolio
 #' @export
 stdev.portfolio <- function(object)
   return(NULL)
 
 
 #' @rdname VaR
+#' @export VaR.layer
 #' @export
 VaR.layer <- function(layer, rp_years, type = c("AEP", "OEP")) {
   type = match.arg(type)
@@ -204,6 +211,7 @@ VaR.layer <- function(layer, rp_years, type = c("AEP", "OEP")) {
 }
 
 #' @rdname tVaR
+#' @export tVaR.layer
 #' @export
 tVaR.layer <- function(layer, rp_years, type = c("AEP", "OEP")) {
   type = match.arg(type)
@@ -225,10 +233,10 @@ tVaR.layer <- function(layer, rp_years, type = c("AEP", "OEP")) {
 #' @param ... Objects to be passed to subsequent methods, if they existed.
 #' @return An object of class summary.layer containing layer parameters, mean,
 #' standard deviation, VaR and tVaR (AEP).
-#' @export
 #' @examples
 #' test_layer <- layer(4000000, 1000000, 1, "yelt_test", lobs=c("PHYSICIANS","CHC","MEDCHOICE"))
 #' summary(test_layer)
+#' @export summary.layer
 #' @export
 summary.layer <- function(object, ...) {
   ans <- list(layer = object,
@@ -253,6 +261,7 @@ summary.layer <- function(object, ...) {
 #' test_layer <- layer(4000000, 1000000, 1, "yelt_test", lobs=c("PHYSICIANS","CHC","MEDCHOICE"))
 #' summary(test_layer)
 #' print(summary(test_layer)) # same thing
+#' @export print.summary.layer
 #' @export
 print.summary.layer <- function(x, ...) {
   print(x$layer)
