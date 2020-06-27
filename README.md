@@ -11,6 +11,7 @@ experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](h
 status](https://travis-ci.com/jfkingiii/layers.svg?branch=master)](https://travis-ci.com/jfkingiii/layers)
 [![Codecov test
 coverage](https://codecov.io/gh/jfkingiii/layers/branch/master/graph/badge.svg)](https://codecov.io/gh/jfkingiii/layers?branch=master)
+[![Version](https://img.shields.io/github/v/tag/jfkingiii/layers?label=Version)](https://github.com/jfkingiii/layers/tags)
 <!-- badges: end -->
 
 The goal of layers is to provide a simple library for doing common
