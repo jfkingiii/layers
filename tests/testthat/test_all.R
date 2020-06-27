@@ -34,6 +34,24 @@ test_that("OEP VaR is accurate", {
   expect_equal(trunc(VaR(gross_layer, 3, "OEP")), 10000000)
 })
 
+test_that("AEP tVaR is accurate", {
+  expect_equal(trunc(tVaR(test_layer, 5, "AEP")), 11975440)
+  expect_equal(trunc(tVaR(gross_layer, 25, "AEP")), 141894334)
+  expect_equal(trunc(tVaR(agg_layer, 50, "AEP")), 11781907)
+})
+
+test_that("OEP tVaR is accurate", {
+  expect_equal(trunc(tVaR(test_layer, 1, "OEP")), 2405781)
+  expect_equal(trunc(tVaR(gross_layer, 5, "OEP")), 13254096)
+  expect_equal(trunc(tVaR(agg_layer, 1, "OEP")), 2405781)
+})
+
+test_that("The layer summary function gives the right values", {
+  expect_equal(summary(layer1)$mean, expected(layer1))
+  expect_equal(summary(layer1)$sd, stdev(layer1))
+  expect_equal(summary(layer1)$var25, VaR(layer1, 25, "AEP"))
+})
+
 
 test_that("Portfolio mean is the sum of layer means", {
   layer_sum <- expected(layer1) + expected(layer2) + expected(layer3)

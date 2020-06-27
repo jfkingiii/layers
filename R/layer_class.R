@@ -124,7 +124,7 @@ print.layer <- function(x, ...) {
 #' print(P)
 #' @export
 print.portfolio <- function(x, ...){
-  sapply(x, function(y) {print(y); cat("\n")})
+  invisible(sapply(x, function(y) {print(y); cat("\n")}))
   }
 
 #' Compute the expected losses ceded to the layer.
