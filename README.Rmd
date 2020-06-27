@@ -17,6 +17,7 @@ knitr::opts_chunk$set(
 
 <!-- badges: start -->
 [![Lifecycle: experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://www.tidyverse.org/lifecycle/#experimental)
+[![Travis build status](https://travis-ci.com/jfkingiii/layers.svg?branch=master)](https://travis-ci.com/jfkingiii/layers)
 <!-- badges: end -->
 
 The goal of layers is to provide a simple library for doing common reinsurance calculations outside of Analyze Re.
