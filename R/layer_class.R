@@ -86,6 +86,7 @@ portfolio <- function(...){
   return(layer_list)
 }
 
+
 #' Print function for objects of class layer.
 #' @param x The layer to be printed.
 #' @param ... Objects to be passed to subsequent methods, if they existed.
@@ -114,6 +115,7 @@ print.layer <- function(x, ...) {
   cat("LOBs:\t\t", x$lobs, "\n")
 }
 
+
 #' Print function for objects of class portfolio.
 #' @param x The layer to be printed.
 #' @param ... Objects to be passed to subsequent methods, if they existed.
@@ -129,6 +131,7 @@ print.portfolio <- function(x, ...){
   invisible(sapply(x, function(y) {print(y); cat("\n")}))
   }
 
+
 #' Compute the expected losses ceded to the layer.
 #' @param object the layer or portfolio to compute the expectation of
 #' @examples
@@ -137,6 +140,7 @@ print.portfolio <- function(x, ...){
 #' @export
 expected <- function(object) UseMethod("expected")
 
+
 #' Compute the standard deviation of losses ceded to the layer.
 #' @param object the layer or portfolio to compute the standard deviation of
 #' @examples
@@ -144,6 +148,7 @@ expected <- function(object) UseMethod("expected")
 #' stdev(test_layer)
 #' @export
 stdev <- function(object) UseMethod("stdev")
+
 
 #' Compute value at risk for the losses in the layer.
 #' @param layer the layer to computer VaR with.
@@ -157,6 +162,7 @@ stdev <- function(object) UseMethod("stdev")
 #' @export
 VaR <- function(layer, rp_years, type = c("AEP", "OEP")) UseMethod("VaR")
 
+
 #' Compute tail value at risk for the losses in the layer.
 #' @param layer the layer to computer VaR with.
 #' @param rp_years Number of years in the return period
@@ -169,11 +175,13 @@ VaR <- function(layer, rp_years, type = c("AEP", "OEP")) UseMethod("VaR")
 #' @export
 tVaR <- function(layer, rp_years, type = c("AEP", "OEP")) UseMethod("tVaR")
 
+
 #' @rdname expected
 #' @export expected.layer
 #' @export
 expected.layer <- function(object)
     return(mean(object$trial_results$ceded_loss))
+
 
 #' @rdname expected
 #' @export expected.portfolio
@@ -181,17 +189,22 @@ expected.layer <- function(object)
 expected.portfolio <- function(object)
   return(sum(sapply(object, expected.layer)))
 
+
 #' @rdname stdev
 #' @export stdev.layer
 #' @export
 stdev.layer <- function(object)
     return(sd(object$trial_results$ceded_loss))
 
+
 #' @rdname stdev
 #' @export stdev.portfolio
 #' @export
-stdev.portfolio <- function(object)
-  return(NULL)
+stdev.portfolio <- function(object){
+  trials <- lapply(portfolio, function(layer) layer$trial_results) %>% bind_rows()
+  trials %>% group_by(.data$trialID) %>% summarise(ceded_loss = sum(.data$ceded_loss), .groups = drop)
+  return(sd(trials$ceded_loss))
+}
 
 
 #' @rdname VaR

@@ -86,6 +86,15 @@ test_that("Portfolio print works", {
   expect_invisible(print(P))
 })
 
+test_that("print.layer.summary works", {
+  s <- summary(layer1)
+  expect_invisible(print(s))
+  u <- print(s)
+  f <- function(y) format(round(y), big.mark = ",", scientific = FALSE)
+  expect_equal(u["Mean:", "Value"], f(expected(layer1)))
+  expect_equal(u["StdDev:", "Value"], f(stdev(layer1)))
+})
+
 
 test_that("Portfolio mean is the sum of layer means", {
   layer_sum <- expected(layer1) + expected(layer2) + expected(layer3)
