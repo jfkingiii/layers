@@ -9,6 +9,8 @@
 experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://www.tidyverse.org/lifecycle/#experimental)
 [![Travis build
 status](https://travis-ci.com/jfkingiii/layers.svg?branch=master)](https://travis-ci.com/jfkingiii/layers)
+[![Codecov test
+coverage](https://codecov.io/gh/jfkingiii/layers/branch/master/graph/badge.svg)](https://codecov.io/gh/jfkingiii/layers?branch=master)
 <!-- badges: end -->
 
 The goal of layers is to provide a simple library for doing common

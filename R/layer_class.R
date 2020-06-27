@@ -3,6 +3,8 @@
 #' @importFrom methods is
 NULL
 
+# dd759a50-1141-41cb-bde2-827210832030 codecov.io
+
 #' A sample YELT (year event loss table) to test layers functions on
 #'
 #' @format A data frame with 127648 rows and 5 variables:
