@@ -4,17 +4,14 @@
 \alias{portfolio}
 \title{Create a portfolio object.}
 \usage{
-portfolio(layer_list)
+portfolio(...)
 }
 \arguments{
-\item{layer_list}{a list of layer objects}
+\item{...}{layers in the portfolio}
 }
 \value{
 The portfolio object.
 }
 \description{
 Create a portfolio object.
-}
-\examples{
-portfolio(list(layer1, layer2, layer3))
 }

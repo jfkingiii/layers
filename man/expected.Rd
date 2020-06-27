@@ -3,14 +3,17 @@
 \name{expected}
 \alias{expected}
 \alias{expected.layer}
+\alias{expected.portfolio}
 \title{Compute the expected losses ceded to the layer.}
 \usage{
-expected(layer)
+expected(object)
 
-\method{expected}{layer}(layer)
+\method{expected}{layer}(object)
+
+\method{expected}{portfolio}(object)
 }
 \arguments{
-\item{layer}{the layer to compute the expectation of}
+\item{object}{the layer or portfolio to compute the expectation of}
 }
 \description{
 Compute the expected losses ceded to the layer.

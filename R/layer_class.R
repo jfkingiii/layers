@@ -1,5 +1,6 @@
 #' @import dplyr
 #' @importFrom stats quantile sd
+#' @importFrom methods is
 NULL
 
 #' A sample YELT (year event loss table) to test layers functions on
@@ -41,21 +42,24 @@ layer <-
            lobs,
            agg_attachment = 0,
            agg_limit = UNLIMITED) {
-    valid_lobs <- unique(get(loss_set)$LOB)
+    # References to .data in dplyr constructions are to avoid
+    # "no visible binding for global variable" note when running BUILD check to check the package
+    valid_lobs <- unique(get(loss_set) %>% pull(.data$LOB))
     stopifnot(all(lobs %in% valid_lobs))
     # Layer object will now store the trial_results data
     losses <-
-      get(loss_set) %>% filter(LOB %in% lobs) %>% select(trialID, Loss)
+      get(loss_set) %>% filter(.data$LOB %in% lobs) %>% select(.data$trialID, .data$Loss)
     losses$layered_loss <-
       pmin(pmax(losses$Loss - attachment, 0), limit) * participation
     trial_results <-
-      losses %>% group_by(trialID) %>% summarise(
-        ceded_loss = sum(layered_loss),
-        max_ceded_loss = max(layered_loss),
+      losses %>% group_by(.data$trialID) %>% summarise(
+        ceded_loss = sum(.data$layered_loss),
+        max_ceded_loss = max(.data$layered_loss),
         .groups = "drop"
       )
     trial_results$ceded_loss <-
-      pmin(pmax(trial_results$ceded_loss - agg_attachment, 0), agg_limit)
+      pmin(pmax(trial_results$ceded_loss - agg_attachment, 0),
+           agg_limit)
     value <-
       list(
         attachment = attachment,
@@ -72,15 +76,14 @@ layer <-
   }
 
 #' Create a portfolio object.
-#'
-#' @param layer_list a list of layer objects
+#' @param ... layers in the portfolio
 #' @return The portfolio object.
 #' @export
-#' @examples
-#' portfolio(list(layer1, layer2, layer3))
-portfolio <- function(layer_list){
-#   stopifnot(is.list(layer_list), all(sapply(layer_list, is, "layer")))
-  return(NULL)
+portfolio <- function(...){
+  layer_list <- list(...)
+  stopifnot(is.list(layer_list), all(sapply(layer_list, is, "layer")))
+  class(layer_list) <- "portfolio"
+  return(layer_list)
 }
 
 #' Print function for objects of class layer.
@@ -110,13 +113,27 @@ print.layer <- function(x, ...) {
   cat("LOBs:\t\t", x$lobs, "\n")
 }
 
+#' Print function for objects of class portfolio.
+#' @param x The layer to be printed.
+#' @param ... Objects to be passed to subsequent methods, if they existed.
+#' @examples
+#' layer1 <- layer(4000000, 1000000, 1, "yelt_test", lobs="PHYSICIANS")
+#' layer2 <- layer(5000000, 5000000, 1, "yelt_test", lobs="PHYSICIANS")
+#' P <- portfolio(layer1, layer2)
+#' P
+#' print(P)
+#' @export
+print.portfolio <- function(x, ...){
+  sapply(x, function(y) {print(y); cat("\n")})
+  }
+
 #' Compute the expected losses ceded to the layer.
-#' @param layer the layer to compute the expectation of
+#' @param object the layer or portfolio to compute the expectation of
 #' @examples
 #' test_layer <- layer(4000000, 1000000, 1, "yelt_test", lobs=c("PHYSICIANS","CHC","MEDCHOICE"))
 #' expected(test_layer)
 #' @export
-expected <- function(layer) UseMethod("expected")
+expected <- function(object) UseMethod("expected")
 
 #' Compute the standard deviation of losses ceded to the layer.
 #' @param layer the layer to compute the standard deviation of
@@ -152,8 +169,13 @@ tVaR <- function(layer, rp_years, type = c("AEP", "OEP")) UseMethod("tVaR")
 
 #' @rdname expected
 #' @export
-expected.layer <- function(layer)
-    return(mean(layer$trial_results$ceded_loss))
+expected.layer <- function(object)
+    return(mean(object$trial_results$ceded_loss))
+
+#' @rdname expected
+#' @export
+expected.portfolio <- function(object)
+  return(sum(sapply(object, expected.layer)))
 
 #' @rdname stdev
 #' @export
