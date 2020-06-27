@@ -94,7 +94,7 @@ portfolio <- function(...){
 #' test_layer
 #' print(test_layer)
 #' @export
-print.layer <- function(x) {
+print.layer <- function(x, ...) {
   attachment <- format(x$attachment, big.mark = ",", scientific = FALSE)
   if (x$limit == UNLIMITED) limit <- "UNLIMITED"
   else limit <-  format(x$limit, big.mark = ",", scientific = FALSE)
