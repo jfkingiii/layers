@@ -48,7 +48,7 @@ layer <-
     stopifnot(all(lobs %in% valid_lobs))
     # Layer object will now store the trial_results data
     losses <-
-      get(loss_set) %>% filter(.data$LOB %in% lobs) %>% select(.data$trialID, .data$Loss)
+      get(loss_set) %>% filter(.data$LOB %in% lobs) %>% select(trialID, Loss)
     losses$layered_loss <-
       pmin(pmax(losses$Loss - attachment, 0), limit) * participation
     trial_results <-

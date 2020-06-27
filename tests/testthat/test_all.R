@@ -11,7 +11,7 @@ layer2 <- layer(5000000, 5000000, 1, "yelt_test", lobs="PHYSICIANS")
 layer3 <- layer(1000000, 10000000, 1, "yelt_test", lobs="PHYSICIANS")
 
 test_that("expected is accurate", {
-  expect_equal(trunc(expected(test_layer)), 678262)
+  expect_equal(trunc(expected(test_layer)), 6782624)
   expect_equal(trunc(expected(gross_layer)), 102235224)
   expect_equal(trunc(expected(agg_layer)), 3037403)
 })
