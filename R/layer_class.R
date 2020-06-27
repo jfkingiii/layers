@@ -44,7 +44,7 @@ layer <-
            agg_limit = UNLIMITED) {
     # References to .data in dplyr constructions are to avoid
     # "no visible binding for global variable" note when running BUILD check to check the package
-    valid_lobs <- unique(get(loss_set) %>% pull(.data$LOB))
+    valid_lobs <- unique(get(loss_set)$LOB)
     stopifnot(all(lobs %in% valid_lobs))
     # Layer object will now store the trial_results data
     losses <-
@@ -136,12 +136,12 @@ print.portfolio <- function(x, ...){
 expected <- function(object) UseMethod("expected")
 
 #' Compute the standard deviation of losses ceded to the layer.
-#' @param layer the layer to compute the standard deviation of
+#' @param object the layer or portfolio to compute the standard deviation of
 #' @examples
 #' test_layer <- layer(4000000, 1000000, 1, "yelt_test", lobs=c("PHYSICIANS","CHC","MEDCHOICE"))
 #' stdev(test_layer)
 #' @export
-stdev <- function(layer) UseMethod("stdev")
+stdev <- function(object) UseMethod("stdev")
 
 #' Compute value at risk for the losses in the layer.
 #' @param layer the layer to computer VaR with.
@@ -179,8 +179,14 @@ expected.portfolio <- function(object)
 
 #' @rdname stdev
 #' @export
-stdev.layer <- function(layer)
-    return(sd(layer$trial_results$ceded_loss))
+stdev.layer <- function(object)
+    return(sd(object$trial_results$ceded_loss))
+
+#' @rdname stdev
+#' @export
+stdev.portfolio <- function(object)
+  return(NULL)
+
 
 #' @rdname VaR
 #' @export

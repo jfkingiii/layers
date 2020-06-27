@@ -14,8 +14,8 @@ coverage](https://codecov.io/gh/jfkingiii/layers/branch/master/graph/badge.svg)]
 [![Version](https://img.shields.io/github/v/tag/jfkingiii/layers?label=Version)](https://github.com/jfkingiii/layers/tags)
 <!-- badges: end -->
 
-The goal of layers is to provide a simple library for doing common
-reinsurance calculations outside of Analyze Re.
+Layers provides a simple library for doing common reinsurance
+calculations outside of Analyze Re.
 
 ## Installation
 
@@ -29,7 +29,7 @@ devtools::install_github("jfkingiii/layers")
 
 ## Example
 
-Use the included sample yelt, `yelt_test` to try out some of the
+Use the included sample yelt, `yelt_test`, to try out some of the
 `layers` functions.
 
 ``` r
@@ -40,8 +40,10 @@ help(package = layers)
 
 # Create some layers and get their metrics
 options(scipen = 999)
-test_layer <- layer(4000000, 1000000, 1, "yelt_test", lobs=c("PHYSICIANS","CHC","MEDCHOICE"))
-gross_layer <- layer(UNLIMITED, 0, 1, "yelt_test", lobs=c("PHYSICIANS","CHC","MEDCHOICE","HOSPITAL"))
+test_layer <- layer(4000000, 1000000, 1, "yelt_test",
+                    lobs=c("PHYSICIANS", "CHC", "MEDCHOICE"))
+gross_layer <- layer(UNLIMITED, 0, 1, "yelt_test",
+                     lobs=c("PHYSICIANS", "CHC", "MEDCHOICE", "HOSPITAL"))
 # Aggregate limits and deductibles are optional and default to UNLIMITED and 0.
 test_layer
 #> Limit:        4,000,000 
@@ -102,7 +104,8 @@ VaR(test_layer, 20, "OEP")
 #> [1] 4000000
 
 # Try a layer with aggregate parameters
-agg_layer <- layer(4000000, 1000000, 1, "yelt_test", lobs=c("PHYSICIANS","CHC","MEDCHOICE"),
+agg_layer <- layer(4000000, 1000000, 1, "yelt_test",
+                   lobs=c("PHYSICIANS","CHC","MEDCHOICE"),
                    agg_attachment = 4000000, agg_limit = 12000000)
 summary(agg_layer)
 #> Limit:        4,000,000 

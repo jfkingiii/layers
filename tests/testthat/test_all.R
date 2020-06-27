@@ -52,6 +52,17 @@ test_that("The layer summary function gives the right values", {
   expect_equal(summary(layer1)$var25, VaR(layer1, 25, "AEP"))
 })
 
+test_that("The layer constructor works", {
+  expect_equal(agg_layer$limit, 4000000)
+  expect_equal(agg_layer$attachment, 1000000)
+  expect_equal(agg_layer$participation, 1)
+  expect_equal(agg_layer$agg_attachment, 4000000)
+  expect_equal(agg_layer$agg_limit, 12000000)
+  expect_equal(agg_layer$loss_set, "yelt_test")
+  expect_equal(agg_layer$lobs, c("PHYSICIANS","CHC","MEDCHOICE"))
+})
+
+
 
 test_that("Portfolio mean is the sum of layer means", {
   layer_sum <- expected(layer1) + expected(layer2) + expected(layer3)

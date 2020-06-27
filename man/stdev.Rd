@@ -3,14 +3,17 @@
 \name{stdev}
 \alias{stdev}
 \alias{stdev.layer}
+\alias{stdev.portfolio}
 \title{Compute the standard deviation of losses ceded to the layer.}
 \usage{
-stdev(layer)
+stdev(object)
 
-\method{stdev}{layer}(layer)
+\method{stdev}{layer}(object)
+
+\method{stdev}{portfolio}(object)
 }
 \arguments{
-\item{layer}{the layer to compute the standard deviation of}
+\item{object}{the layer or portfolio to compute the standard deviation of}
 }
 \description{
 Compute the standard deviation of losses ceded to the layer.
