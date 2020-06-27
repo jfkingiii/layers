@@ -4,7 +4,7 @@
 \alias{print.layer}
 \title{Print function for objects of class layer.}
 \usage{
-\method{print}{layer}(x, ...)
+\method{print}{layer}(x)
 }
 \arguments{
 \item{x}{The layer to be printed.}

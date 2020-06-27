@@ -48,7 +48,7 @@ layer <-
     stopifnot(all(lobs %in% valid_lobs))
     # Layer object will now store the trial_results data
     losses <-
-      get(loss_set) %>% filter(.data$LOB %in% lobs) %>% select(trialID, Loss)
+      get(loss_set) %>% filter(.data$LOB %in% lobs) %>% select(.data$trialID, .data$Loss)
     losses$layered_loss <-
       pmin(pmax(losses$Loss - attachment, 0), limit) * participation
     trial_results <-
@@ -94,7 +94,7 @@ portfolio <- function(...){
 #' test_layer
 #' print(test_layer)
 #' @export
-print.layer <- function(x, ...) {
+print.layer <- function(x) {
   attachment <- format(x$attachment, big.mark = ",", scientific = FALSE)
   if (x$limit == UNLIMITED) limit <- "UNLIMITED"
   else limit <-  format(x$limit, big.mark = ",", scientific = FALSE)
