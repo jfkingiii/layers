@@ -9,6 +9,10 @@ agg_layer <- layer(4000000, 1000000, 1, "yelt_test", lobs=c("PHYSICIANS","CHC","
 layer1 <- layer(100000, 100000, 1, "yelt_test", lobs="PHYSICIANS")
 layer2 <- layer(100000, 200000, 1, "yelt_test", lobs="PHYSICIANS")
 layer3 <- layer(100000, 300000, 1, "yelt_test", lobs="PHYSICIANS")
+test_layer <- layer(4000000, 1000000, 1, "yelt_test",
+                    lobs=c("PHYSICIANS", "CHC", "MEDCHOICE"))
+gross_layer <- layer(UNLIMITED, 0, 1, "yelt_test",
+                     lobs=c("PHYSICIANS", "CHC", "MEDCHOICE", "HOSPITAL"))
 
 P <- portfolio(layer1, layer2, layer3)
 
@@ -96,7 +100,12 @@ test_that("The portfolio constructor works", {
 })
 
 test_that("Layer print works", {
-  expect_invisible(print(layer1))
+  expect_error(print(layer1), NA)
+  expect_error(print(test_layer), NA)
+  expect_error(print(gross_layer), NA)
+  expect_error(print(agg_layer), NA)
+  expect_equal(dim(print(agg_layer)), c(7, 1))
+  expect_equal(dim(print(test_layer)), c(5, 1))
 })
 
 test_that("Portfolio print works", {

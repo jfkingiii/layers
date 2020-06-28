@@ -110,22 +110,26 @@ portfolio <- function(...) {
 #' @export print.layer
 #' @export
 print.layer <- function(x, ...) {
+  # fix this to handle agg limit and agg deductible correctly
   attachment <- format(x$attachment, big.mark = ",", scientific = FALSE)
   if (x$limit == UNLIMITED) limit <- "UNLIMITED"
   else limit <-  format(x$limit, big.mark = ",", scientific = FALSE)
   participation <- format(x$participation, nsmall=3, format="f")
-  cat("Limit:\t\t", limit, "\n")
-  cat("Attachment:\t", attachment, "\n")
-  cat("Participation:\t", participation, "\n")
+  df <- data.frame(
+    row.names = c("Limit:", "Attachment:", "Participation:", "Loss set:", "LOBs:"),
+    Value = c(limit, attachment, participation, x$loss_set, paste(x$lobs, collapse=" ")))
   if (x$agg_attachment != 0 | x$agg_limit != UNLIMITED)
   {
     agg_attachment <- format(x$agg_attachment, big.mark = ",", scientific = FALSE)
     agg_limit <-  format(x$agg_limit, big.mark = ",", scientific = FALSE)
-    cat("Agg Attachment:\t", agg_attachment, "\n")
-    cat("Agg Limit:\t", agg_limit, "\n")
+    df2 <-
+      data.frame(
+        row.names = c("Agg Attachment:", "Agg Limit:"),
+        Value = c(agg_attachment, agg_limit)
+      )
+    df <- rbind(df, df2)
   }
-  cat("Loss set:\t", x$loss_set, "\n")
-  cat("LOBs:\t\t", x$lobs, "\n")
+  print(df)
 }
 
 

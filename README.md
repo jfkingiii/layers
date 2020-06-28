@@ -46,25 +46,28 @@ gross_layer <- layer(UNLIMITED, 0, 1, "yelt_test",
                      lobs=c("PHYSICIANS", "CHC", "MEDCHOICE", "HOSPITAL"))
 # Aggregate limits and deductibles are optional and default to UNLIMITED and 0.
 test_layer
-#> Limit:        4,000,000 
-#> Attachment:   1,000,000 
-#> Participation:    1.000 
-#> Loss set:     yelt_test 
-#> LOBs:         PHYSICIANS CHC MEDCHOICE
+#>                                   Value
+#> Limit:                        4,000,000
+#> Attachment:                   1,000,000
+#> Participation:                    1.000
+#> Loss set:                     yelt_test
+#> LOBs:          PHYSICIANS CHC MEDCHOICE
 
 gross_layer
-#> Limit:        UNLIMITED 
-#> Attachment:   0 
-#> Participation:    1.000 
-#> Loss set:     yelt_test 
-#> LOBs:         PHYSICIANS CHC MEDCHOICE HOSPITAL
+#>                                            Value
+#> Limit:                                 UNLIMITED
+#> Attachment:                                    0
+#> Participation:                             1.000
+#> Loss set:                              yelt_test
+#> LOBs:          PHYSICIANS CHC MEDCHOICE HOSPITAL
 
 summary(test_layer)
-#> Limit:        4,000,000 
-#> Attachment:   1,000,000 
-#> Participation:    1.000 
-#> Loss set:     yelt_test 
-#> LOBs:         PHYSICIANS CHC MEDCHOICE 
+#>                                   Value
+#> Limit:                        4,000,000
+#> Attachment:                   1,000,000
+#> Participation:                    1.000
+#> Loss set:                     yelt_test
+#> LOBs:          PHYSICIANS CHC MEDCHOICE
 #> 
 #>                Value
 #> Mean:      6,782,625
@@ -77,11 +80,12 @@ summary(test_layer)
 #> tVaR 250: 19,018,259
 
 summary(gross_layer)
-#> Limit:        UNLIMITED 
-#> Attachment:   0 
-#> Participation:    1.000 
-#> Loss set:     yelt_test 
-#> LOBs:         PHYSICIANS CHC MEDCHOICE HOSPITAL 
+#>                                            Value
+#> Limit:                                 UNLIMITED
+#> Attachment:                                    0
+#> Participation:                             1.000
+#> Loss set:                              yelt_test
+#> LOBs:          PHYSICIANS CHC MEDCHOICE HOSPITAL
 #> 
 #>                 Value
 #> Mean:     102,235,225
@@ -108,13 +112,14 @@ agg_layer <- layer(4000000, 1000000, 1, "yelt_test",
                    lobs=c("PHYSICIANS","CHC","MEDCHOICE"),
                    agg_attachment = 4000000, agg_limit = 12000000)
 summary(agg_layer)
-#> Limit:        4,000,000 
-#> Attachment:   1,000,000 
-#> Participation:    1.000 
-#> Agg Attachment:   4,000,000 
-#> Agg Limit:    12,000,000 
-#> Loss set:     yelt_test 
-#> LOBs:         PHYSICIANS CHC MEDCHOICE 
+#>                                    Value
+#> Limit:                         4,000,000
+#> Attachment:                    1,000,000
+#> Participation:                     1.000
+#> Loss set:                      yelt_test
+#> LOBs:           PHYSICIANS CHC MEDCHOICE
+#> Agg Attachment:                4,000,000
+#> Agg Limit:                    12,000,000
 #> 
 #>                Value
 #> Mean:      3,037,403
