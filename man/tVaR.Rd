@@ -3,11 +3,14 @@
 \name{tVaR}
 \alias{tVaR}
 \alias{tVaR.layer}
+\alias{tVaR.portfolio}
 \title{Compute tail value at risk for the losses in the layer.}
 \usage{
 tVaR(object, rp_years, type = c("AEP", "OEP"))
 
 \method{tVaR}{layer}(object, rp_years, type = c("AEP", "OEP"))
+
+\method{tVaR}{portfolio}(object, rp_years, type = c("AEP", "OEP"))
 }
 \arguments{
 \item{object}{the layer or portfolio to computer VaR with.}

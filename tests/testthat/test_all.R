@@ -121,6 +121,11 @@ test_that("print.layer.summary works", {
   expect_equal(u["StdDev:", "Value"], f(stdev(layer1)))
 })
 
+test_that("minus function works", {
+  expect_equal(expected(gross_layer) - expected(test_layer),
+               expected(portfolio(gross_layer, minus(test_layer))))
+})
+
 
 test_that("Portfolio mean is the sum of layer means", {
   layer_sum <- expected(layer1) + expected(layer2) + expected(layer3)

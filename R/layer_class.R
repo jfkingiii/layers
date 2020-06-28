@@ -169,6 +169,15 @@ expected <- function(object) UseMethod("expected")
 #' @export
 stdev <- function(object) UseMethod("stdev")
 
+#' Change the sign of the losses in a layer.
+#' @param object the layer to change the sign of
+#' @examples
+#' test_layer <- layer(4000000, 1000000, 1, "yelt_test", lobs=c("PHYSICIANS","CHC","MEDCHOICE"))
+#' minus(test_layer)
+#' @export
+minus <- function(object) UseMethod("minus")
+
+
 
 #' Compute value at risk for the losses in the layer.
 #' @param object the layer or portfolio to computer VaR with.
@@ -217,6 +226,17 @@ stdev.layer <- function(object)
     return(sd(object$trial_results$ceded_loss))
 
 
+#' @rdname minus
+#' @export minus.layer
+#' @export
+minus.layer <- function(object)
+{
+  object$trial_results$ceded_loss <- -object$trial_results$ceded_loss
+  object$trial_results$max_ceded_loss <- -object$trial_results$max_ceded_loss
+  return(object)
+}
+
+
 #' @rdname stdev
 #' @export stdev.portfolio
 #' @export
@@ -247,7 +267,8 @@ VaR.layer <- function(object, rp_years, type = c("AEP", "OEP")) {
 #' @export VaR.portfolio
 #' @export
 VaR.portfolio <- function(object, rp_years, type = c("AEP", "OEP")) {
-  stopifnot(type == "AEP") # OEP not working yet for portfolios
+  type = match.arg(type)
+  stopifnot(type == "AEP") # OEP not working for portfolios
   aep_sort <- sort(object$trial_results$ceded_loss, decreasing = TRUE)
   ans <- aep_sort[nrow(object$trial_results) / rp_years]
   return(unname(ans))
@@ -269,6 +290,20 @@ tVaR.layer <- function(object, rp_years, type = c("AEP", "OEP")) {
   }
   return(unname(ans))
 }
+
+
+#' @rdname tVaR
+#' @export tVaR.portfolio
+#' @export
+tVaR.portfolio <- function(object, rp_years, type = c("AEP", "OEP")) {
+  type = match.arg(type)
+  stopifnot(type == "AEP") # OEP not working for portfolios
+  v <- VaR(object = object, rp_years = rp_years, type = type)
+  aep <- object$trial_results$ceded_loss
+  ans <- mean(aep[aep >= v])
+  return(unname(ans))
+}
+
 
 #'  Summarize the layer parameters, and compute some metrics
 #'  for the layer.
