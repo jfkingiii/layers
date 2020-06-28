@@ -44,6 +44,8 @@ layer <-
            agg_limit = UNLIMITED) {
     # References to .data in dplyr constructions are to avoid
     # "no visible binding for global variable" note when running BUILD check to check the package
+    # The loss set is expected to have columns named LOB, trialID, and Loss
+    stopifnot(all(c("LOB", "trialID", "Loss") %in% names(get(loss_set))))
     valid_lobs <- unique(get(loss_set)$LOB)
     stopifnot(all(lobs %in% valid_lobs))
     # Layer object will now store the trial_results data
@@ -79,11 +81,22 @@ layer <-
 #' @param ... layers in the portfolio
 #' @return The portfolio object.
 #' @export
-portfolio <- function(...){
+portfolio <- function(...) {
   layer_list <- list(...)
+  # make sure all the arguments are layers
   stopifnot(is.list(layer_list), all(sapply(layer_list, is, "layer")))
-  class(layer_list) <- "portfolio"
-  return(layer_list)
+  # need a test that the loss sets are the same for every layer
+  lsnames <- unique(sapply(layer_list, function(x) x$loss_set))
+  stopifnot(length(lsnames) == 1)
+  trial_results <-
+    lapply(layer_list, function(layer) layer$trial_results) %>%
+      bind_rows()
+  trial_results <-
+    trial_results %>% group_by(.data$trialID) %>% summarise(
+      ceded_loss = sum(.data$ceded_loss), .groups = "drop")
+  ans <- list(layer_list = layer_list, trial_results = trial_results)
+  class(ans) <- "portfolio"
+  return(ans)
 }
 
 
@@ -127,9 +140,12 @@ print.layer <- function(x, ...) {
 #' print(P)
 #' @export print.portfolio
 #' @export
-print.portfolio <- function(x, ...){
-  invisible(sapply(x, function(y) {print(y); cat("\n")}))
+print.portfolio <- function(x, ...) {
+  for (layer in x$layer_list) {
+    print(layer)
+    cat("\n")
   }
+}
 
 
 #' Compute the expected losses ceded to the layer.
@@ -151,7 +167,7 @@ stdev <- function(object) UseMethod("stdev")
 
 
 #' Compute value at risk for the losses in the layer.
-#' @param layer the layer to computer VaR with.
+#' @param object the layer or portfolio to computer VaR with.
 #' @param rp_years Number of years in the return period
 #' @param type AEP (aggregate exceedance probability)or OEP (occurrence exceedance probability). Defaults to AEP.
 #' @examples
@@ -160,11 +176,11 @@ stdev <- function(object) UseMethod("stdev")
 #' VaR(gross_layer, 25, "AEP") # the same thing
 #' VaR(gross_layer, 25, "OEP")
 #' @export
-VaR <- function(layer, rp_years, type = c("AEP", "OEP")) UseMethod("VaR")
+VaR <- function(object, rp_years, type = c("AEP", "OEP")) UseMethod("VaR")
 
 
 #' Compute tail value at risk for the losses in the layer.
-#' @param layer the layer to computer VaR with.
+#' @param object the layer or portfolio to computer VaR with.
 #' @param rp_years Number of years in the return period
 #' @param type AEP (aggregate exceedance probability)or OEP (occurrence exceedance probability). Defaults to AEP.
 #' @examples
@@ -173,7 +189,7 @@ VaR <- function(layer, rp_years, type = c("AEP", "OEP")) UseMethod("VaR")
 #' tVaR(gross_layer, 25, "AEP") # the same thing
 #' tVaR(gross_layer, 25, "OEP")
 #' @export
-tVaR <- function(layer, rp_years, type = c("AEP", "OEP")) UseMethod("tVaR")
+tVaR <- function(object, rp_years, type = c("AEP", "OEP")) UseMethod("tVaR")
 
 
 #' @rdname expected
@@ -187,7 +203,7 @@ expected.layer <- function(object)
 #' @export expected.portfolio
 #' @export
 expected.portfolio <- function(object)
-  return(sum(sapply(object, expected.layer)))
+  return(mean(object$trial_results$ceded_loss))
 
 
 #' @rdname stdev
@@ -201,40 +217,50 @@ stdev.layer <- function(object)
 #' @export stdev.portfolio
 #' @export
 stdev.portfolio <- function(object){
-  trials <- lapply(portfolio, function(layer) layer$trial_results) %>% bind_rows()
-  trials %>% group_by(.data$trialID) %>% summarise(ceded_loss = sum(.data$ceded_loss), .groups = drop)
-  return(sd(trials$ceded_loss))
+  #return(sd(trials$ceded_loss))
+  return(sd(object$trial_results$ceded_loss))
 }
 
 
 #' @rdname VaR
 #' @export VaR.layer
 #' @export
-VaR.layer <- function(layer, rp_years, type = c("AEP", "OEP")) {
+VaR.layer <- function(object, rp_years, type = c("AEP", "OEP")) {
   type = match.arg(type)
   if (type == "AEP") {
-    aep_sort <- sort(layer$trial_results$ceded_loss, decreasing = TRUE)
-    ans <- aep_sort[nrow(layer$trial_results)/rp_years]
+    aep_sort <- sort(object$trial_results$ceded_loss, decreasing = TRUE)
+    ans <- aep_sort[nrow(object$trial_results)/rp_years]
   }
   else if (type == "OEP") {
-    oep_sort <- sort(layer$trial_results$max_ceded_loss, decreasing = TRUE)
-    ans <- oep_sort[nrow(layer$trial_results)/rp_years]
+    oep_sort <- sort(object$trial_results$max_ceded_loss, decreasing = TRUE)
+    ans <- oep_sort[nrow(object$trial_results)/rp_years]
   }
+  return(unname(ans))
+}
+
+
+#' @rdname VaR
+#' @export VaR.portfolio
+#' @export
+VaR.portfolio <- function(object, rp_years, type = c("AEP", "OEP")) {
+  stopifnot(type == "AEP") # OEP not working yet for portfolios
+  aep_sort <- sort(object$trial_results$ceded_loss, decreasing = TRUE)
+  ans <- aep_sort[nrow(object$trial_results) / rp_years]
   return(unname(ans))
 }
 
 #' @rdname tVaR
 #' @export tVaR.layer
 #' @export
-tVaR.layer <- function(layer, rp_years, type = c("AEP", "OEP")) {
+tVaR.layer <- function(object, rp_years, type = c("AEP", "OEP")) {
   type = match.arg(type)
-  v <- VaR(layer = layer, rp_years = rp_years, type = type)
+  v <- VaR(object = object, rp_years = rp_years, type = type)
   if (type == "AEP") {
-    aep <- layer$trial_results$ceded_loss
+    aep <- object$trial_results$ceded_loss
     ans <- mean(aep[aep >= v])
   }
   else if (type == "OEP") {
-    oep <- layer$trial_results$max_ceded_loss
+    oep <- object$trial_results$max_ceded_loss
     ans <- mean(oep[oep >= v])
   }
   return(unname(ans))

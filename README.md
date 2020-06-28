@@ -127,13 +127,13 @@ summary(agg_layer)
 #> tVaR 250: 12,000,000
 
 # Portolio expected losses
-layer1 <- layer(1000000, 4000000, 1, "yelt_test", lobs="PHYSICIANS")
-layer2 <- layer(5000000, 5000000, 1, "yelt_test", lobs="PHYSICIANS")
-layer3 <- layer(1000000, 10000000, 1, "yelt_test", lobs="PHYSICIANS")
+layer1 <- layer(100000, 100000, 1, "yelt_test", lobs="PHYSICIANS")
+layer2 <- layer(100000, 200000, 1, "yelt_test", lobs="PHYSICIANS")
+layer3 <- layer(100000, 300000, 1, "yelt_test", lobs="PHYSICIANS")
 P <- portfolio(layer1, layer2, layer3)
 
 expected(layer1) + expected(layer2) + expected(layer3)
-#> [1] 258788
+#> [1] 19472924
 expected(P)
-#> [1] 258788
+#> [1] 19472924
 ```

@@ -6,11 +6,22 @@ test_layer <- layer(4000000, 1000000, 1, "yelt_test", lobs=c("PHYSICIANS","CHC",
 gross_layer <- layer(UNLIMITED, 0, 1, "yelt_test", lobs=c("PHYSICIANS","CHC","MEDCHOICE","HOSPITAL"))
 agg_layer <- layer(4000000, 1000000, 1, "yelt_test", lobs=c("PHYSICIANS","CHC","MEDCHOICE"),
                    agg_attachment = 4000000, agg_limit = 12000000)
-layer1 <- layer(1000000, 4000000, 1, "yelt_test", lobs="PHYSICIANS")
-layer2 <- layer(5000000, 5000000, 1, "yelt_test", lobs="PHYSICIANS")
-layer3 <- layer(1000000, 10000000, 1, "yelt_test", lobs="PHYSICIANS")
+layer1 <- layer(100000, 100000, 1, "yelt_test", lobs="PHYSICIANS")
+layer2 <- layer(100000, 200000, 1, "yelt_test", lobs="PHYSICIANS")
+layer3 <- layer(100000, 300000, 1, "yelt_test", lobs="PHYSICIANS")
 
 P <- portfolio(layer1, layer2, layer3)
+
+assign("yelt2", yelt_test[1:10000, ], pos = 1) # pos=1 so get can find yelt2
+layer_different <- layer(100000, 100000, 1, "yelt2", lobs = "PHYSICIANS")
+
+test_that("portfolio errors if layers have different loss sets", {
+  expect_error(portfolio(layer2, layer_different))
+})
+
+test_that("yelt_test is OK", {
+expect_equal(nrow(yelt_test), 127648)
+})
 
 test_that("expected is accurate", {
   expect_equal(trunc(expected(test_layer)), 6782624)
@@ -68,14 +79,20 @@ test_that("The layer constructor works", {
   expect_equal(agg_layer$agg_limit, 12000000)
   expect_equal(agg_layer$loss_set, "yelt_test")
   expect_equal(agg_layer$lobs, c("PHYSICIANS","CHC","MEDCHOICE"))
+  ceded1 <- sum(layer2$trial_results$ceded_loss)
+  ls <- get(layer2$loss_set)
+  x <- subset(ls, LOB == "PHYSICIANS")$Loss
+  ceded2 <- sum(pmin(pmax(x - layer2$attachment, 0), layer2$limit))
+  expect_equal(ceded1, ceded2)
+  expect_equal(nrow(layer2$trial_results), length(unique(ls$trialID)))
 })
 
 test_that("The portfolio constructor works", {
   P <- portfolio(layer1, layer2, layer3)
   expect_equal(class(P), "portfolio")
-  expect_identical(layer1, P[[1]])
-  expect_identical(layer2, P[[2]])
-  expect_identical(layer3, P[[3]])
+  expect_identical(layer1, P$layer_list[[1]])
+  expect_identical(layer2, P$layer_list[[2]])
+  expect_identical(layer3, P$layer_list[[3]])
 })
 
 test_that("Layer print works", {

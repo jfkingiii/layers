@@ -5,12 +5,12 @@
 \alias{tVaR.layer}
 \title{Compute tail value at risk for the losses in the layer.}
 \usage{
-tVaR(layer, rp_years, type = c("AEP", "OEP"))
+tVaR(object, rp_years, type = c("AEP", "OEP"))
 
-\method{tVaR}{layer}(layer, rp_years, type = c("AEP", "OEP"))
+\method{tVaR}{layer}(object, rp_years, type = c("AEP", "OEP"))
 }
 \arguments{
-\item{layer}{the layer to computer VaR with.}
+\item{object}{the layer or portfolio to computer VaR with.}
 
 \item{rp_years}{Number of years in the return period}
 
