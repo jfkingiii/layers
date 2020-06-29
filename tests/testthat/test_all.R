@@ -75,6 +75,16 @@ test_that("The layer summary function gives the right values", {
 })
 
 test_that("The layer constructor works", {
+  agg_layer <-
+    layer(
+      4000000,
+      1000000,
+      1,
+      "yelt_test",
+      lobs = c("PHYSICIANS", "CHC", "MEDCHOICE"),
+      agg_attachment = 4000000,
+      agg_limit = 12000000
+    )
   expect_equal(agg_layer$limit, 4000000)
   expect_equal(agg_layer$attachment, 1000000)
   expect_equal(agg_layer$participation, 1)
@@ -108,10 +118,11 @@ test_that("Layer print works", {
 })
 
 test_that("Portfolio print works", {
+  expect_error(print(P), NA)
   expect_invisible(print(P))
 })
 
-test_that("print.layer.summary works", {
+test_that("print.summary.layer works", {
   s <- summary(layer1)
   expect_invisible(print(s))
   u <- print(s)
@@ -123,8 +134,8 @@ test_that("print.layer.summary works", {
 test_that("minus function works", {
   expect_equal(expected(gross_layer) - expected(test_layer),
                expected(portfolio(gross_layer, minus(test_layer))))
+  expect_equal(expected(minus(gross_layer)), -expected(gross_layer))
 })
-
 
 test_that("Portfolio mean is the sum of layer means", {
   layer_sum <- expected(layer1) + expected(layer2) + expected(layer3)
