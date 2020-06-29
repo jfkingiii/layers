@@ -3,11 +3,14 @@
 \name{minus}
 \alias{minus}
 \alias{minus.layer}
+\alias{minus.portfolio}
 \title{Change the sign of the losses in a layer.}
 \usage{
 minus(object)
 
 \method{minus}{layer}(object)
+
+\method{minus}{portfolio}(object)
 }
 \arguments{
 \item{object}{the layer to change the sign of}

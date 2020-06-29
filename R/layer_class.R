@@ -52,7 +52,7 @@ layer <-
     losses <-
       get(loss_set) %>% filter(.data$LOB %in% lobs) %>% select(.data$trialID, .data$Loss)
     losses$layered_loss <-
-      pmin(pmax(losses$Loss - attachment, 0), limit) * participation
+      pmin(pmax(losses$Loss - attachment, 0), limit)
     trial_results <-
       losses %>% group_by(.data$trialID) %>% summarise(
         ceded_loss = sum(.data$layered_loss),
@@ -61,7 +61,7 @@ layer <-
       )
     trial_results$ceded_loss <-
       pmin(pmax(trial_results$ceded_loss - agg_attachment, 0),
-           agg_limit)
+           agg_limit) * participation
     value <-
       list(
         attachment = attachment,
@@ -178,7 +178,6 @@ stdev <- function(object) UseMethod("stdev")
 minus <- function(object) UseMethod("minus")
 
 
-
 #' Compute value at risk for the losses in the layer.
 #' @param object the layer or portfolio to computer VaR with.
 #' @param rp_years Number of years in the return period
@@ -226,23 +225,31 @@ stdev.layer <- function(object)
     return(sd(object$trial_results$ceded_loss))
 
 
-#' @rdname minus
-#' @export minus.layer
-#' @export
-minus.layer <- function(object)
-{
-  object$trial_results$ceded_loss <- -object$trial_results$ceded_loss
-  object$trial_results$max_ceded_loss <- -object$trial_results$max_ceded_loss
-  return(object)
-}
-
-
 #' @rdname stdev
 #' @export stdev.portfolio
 #' @export
 stdev.portfolio <- function(object){
   #return(sd(trials$ceded_loss))
   return(sd(object$trial_results$ceded_loss))
+}
+
+
+#' @rdname minus
+#' @export minus.layer
+#' @export
+minus.layer <- function(object){
+  object$trial_results$ceded_loss <- (-object$trial_results$ceded_loss)
+  object$trial_results$max_ceded_loss <- (-object$trial_results$max_ceded_loss)
+  return(object)
+}
+
+
+#' @rdname minus
+#' @export minus.layer
+#' @export
+minus.portfolio <- function(object){
+   minus_list <- lapply(object$layer_list, minus)
+   return(do.call(portfolio, minus_list))
 }
 
 

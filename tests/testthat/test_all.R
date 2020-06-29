@@ -9,10 +9,8 @@ agg_layer <- layer(4000000, 1000000, 1, "yelt_test", lobs=c("PHYSICIANS","CHC","
 layer1 <- layer(100000, 100000, 1, "yelt_test", lobs="PHYSICIANS")
 layer2 <- layer(100000, 200000, 1, "yelt_test", lobs="PHYSICIANS")
 layer3 <- layer(100000, 300000, 1, "yelt_test", lobs="PHYSICIANS")
-test_layer <- layer(4000000, 1000000, 1, "yelt_test",
-                    lobs=c("PHYSICIANS", "CHC", "MEDCHOICE"))
-gross_layer <- layer(UNLIMITED, 0, 1, "yelt_test",
-                     lobs=c("PHYSICIANS", "CHC", "MEDCHOICE", "HOSPITAL"))
+
+layer_qs <- layer(100000, 300000, 0.25, "yelt_test", lobs="PHYSICIANS")
 
 P <- portfolio(layer1, layer2, layer3)
 
@@ -31,6 +29,7 @@ test_that("expected is accurate", {
   expect_equal(trunc(expected(test_layer)), 6782624)
   expect_equal(trunc(expected(gross_layer)), 102235224)
   expect_equal(trunc(expected(agg_layer)), 3037403)
+  expect_equal(expected(layer_qs)/expected(layer3), 0.25)
 })
 
 test_that("standard deviation is accurate", {
