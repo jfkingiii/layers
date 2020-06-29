@@ -142,4 +142,9 @@ test_that("Portfolio mean is the sum of layer means", {
   expect_equal(layer_sum, expected(P))
 })
 
+test_that("Portfolio mean is the sum of layer means", {
+  expect_equal(round(AAL(yelt_test, all = TRUE)), 102235225)
+})
+
+
 print("test complete")

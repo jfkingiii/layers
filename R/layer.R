@@ -96,7 +96,6 @@ expected.layer <- function(object)
 # TODO what if some of the trials has no losses? then this mean will not work
     return(mean(object$trial_results$ceded_loss))
 
-
 #' @rdname stdev
 #' @export stdev.layer
 #' @export
