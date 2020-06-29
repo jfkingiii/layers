@@ -22,6 +22,7 @@ portfolio <- function(...) {
   return(ans)
 }
 
+
 #' Print function for objects of class portfolio.
 #' @param x The layer to be printed.
 #' @param ... Objects to be passed to subsequent methods, if they existed.
@@ -40,11 +41,13 @@ print.portfolio <- function(x, ...) {
   }
 }
 
+
 #' @rdname expected
 #' @export expected.portfolio
 #' @export
 expected.portfolio <- function(object)
   return(mean(object$trial_results$ceded_loss))
+
 
 #' @rdname stdev
 #' @export stdev.portfolio
@@ -54,6 +57,7 @@ stdev.portfolio <- function(object){
   return(sd(object$trial_results$ceded_loss))
 }
 
+
 #' @rdname minus
 #' @export minus.layer
 #' @export
@@ -61,6 +65,7 @@ minus.portfolio <- function(object){
   minus_list <- lapply(object$layer_list, minus)
   return(do.call(portfolio, minus_list))
 }
+
 
 #' @rdname VaR
 #' @export VaR.portfolio
@@ -73,6 +78,7 @@ VaR.portfolio <- function(object, rp_years, type = c("AEP", "OEP")) {
   return(unname(ans))
 }
 
+
 #' @rdname tVaR
 #' @export tVaR.portfolio
 #' @export
@@ -84,4 +90,3 @@ tVaR.portfolio <- function(object, rp_years, type = c("AEP", "OEP")) {
   ans <- mean(aep[aep >= v])
   return(unname(ans))
 }
-

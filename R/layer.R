@@ -93,6 +93,7 @@ print.layer <- function(x, ...) {
 #' @export expected.layer
 #' @export
 expected.layer <- function(object)
+# TODO what if some of the trials has no losses? then this mean will not work
     return(mean(object$trial_results$ceded_loss))
 
 
@@ -113,9 +114,6 @@ minus.layer <- function(object){
 }
 
 
-
-
-
 #' @rdname VaR
 #' @export VaR.layer
 #' @export
@@ -131,8 +129,6 @@ VaR.layer <- function(object, rp_years, type = c("AEP", "OEP")) {
   }
   return(unname(ans))
 }
-
-
 
 
 #' @rdname tVaR
@@ -151,8 +147,6 @@ tVaR.layer <- function(object, rp_years, type = c("AEP", "OEP")) {
   }
   return(unname(ans))
 }
-
-
 
 
 #'  Summarize the layer parameters, and compute some metrics
@@ -210,5 +204,3 @@ print.summary.layer <- function(x, ...) {
     Value = z
   ))
 }
-
-

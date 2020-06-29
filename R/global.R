@@ -3,6 +3,7 @@
 #' @importFrom methods is
 NULL
 
+
 #' A sample YELT (year event loss table) to test layers functions on
 #'
 #' @format A data frame with 127648 rows and 5 variables:
@@ -15,9 +16,11 @@ NULL
 #' }
 "yelt_test"
 
+
 #' Convenient synonym for .Machine$double.xmax.
 #' @export
 UNLIMITED <- .Machine$double.xmax
+
 
 #' Compute the expected losses ceded to the layer.
 #' @param object the layer or portfolio to compute the expectation of
@@ -76,12 +79,11 @@ tVaR <- function(object, rp_years, type = c("AEP", "OEP")) UseMethod("tVaR")
 #' @examples
 #' AAL(yelt_test)
 #' @export
-AAL <- function(yelt) {
+AAL <- function(yelt, all=FALSE) {
   stopifnot(all(c("trialID", "LOB", "Loss") %in% names(yelt)))
-  # TODO what if there are no losses for some LOB and trialID combinations?
-  ans <- yelt %>% group_by(.data$trialID, .data$LOB) %>%
-    summarise(loss = sum(.data$Loss), .groups = "drop") %>%
-    group_by(.data$LOB) %>%
-    summarise(loss = mean(.data$loss), .groups = "drop")
+  n_trials <- length(unique(yelt$trialID))
+  ans <- yelt %>% group_by(.data$LOB) %>%
+    summarise(loss = sum(.data$Loss)/n_trials, .groups = "drop")
+  if (all) ans <- sum(ans$loss)
   return(ans)
 }
