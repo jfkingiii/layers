@@ -4,10 +4,12 @@
 \alias{AAL}
 \title{A function to calculate Average Annual Loss (AAL) from a yelt}
 \usage{
-AAL(yelt)
+AAL(yelt, all = FALSE)
 }
 \arguments{
 \item{yelt}{The yelt as a data frame or tibble. It must contain columns named trialID, LOB, and Loss}
+
+\item{all}{A flag - show each line individually or show a single number for all combined}
 }
 \description{
 A function to calculate Average Annual Loss (AAL) from a yelt
