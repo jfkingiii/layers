@@ -17,7 +17,8 @@ NULL
 "yelt_test"
 
 
-#' Convenient synonym for .Machine$double.xmax.
+#' A convenient synonym for .Machine$double.xmax; used for the limit parameter when there is
+#' no limit.
 #' @export
 UNLIMITED <- .Machine$double.xmax
 

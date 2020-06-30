@@ -1,5 +1,5 @@
 #' Explodes a list of porfolios into a list of layers.
-#' @param L the layers to be exploded
+#' @param L list of portfolios to be exploded
 #' @return A list containing all the layers in L
 #' @export
 explode <- function(L){

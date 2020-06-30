@@ -1,13 +1,13 @@
 Package: layers
-Title: Compute metrics for reinsurance layers
-Version: 0.1.0.9000
+Title: Reinsurance Layers and Metrics
+Version: 0.1.3.9000
 Authors@R:
     person(given = "James",
            family = "King",
            role = c("aut", "cre"),
            email = "jfking@lockton.com",
            comment = c(ORCID = "YOUR-ORCID-ID"))
-Description: What the package does (one paragraph).
+Description: Compute metrics for reinsurance layers and portfolios. Layers and portfolios are S3 classes, and methods are called to compute metrics.
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true

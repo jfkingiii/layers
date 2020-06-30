@@ -7,7 +7,7 @@
 explode(L)
 }
 \arguments{
-\item{L}{the layers to be exploded}
+\item{L}{list of portfolios to be exploded}
 }
 \value{
 A list containing all the layers in L

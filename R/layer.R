@@ -26,7 +26,7 @@ layer <-
     stopifnot(all(c("LOB", "trialID", "Loss") %in% names(get(loss_set))))
     valid_lobs <- unique(get(loss_set)$LOB)
     stopifnot(all(lobs %in% valid_lobs))
-    # Layer object will now store the trial_results data
+    # Layer object will store the trial_results data
     losses <-
       get(loss_set) %>% filter(.data$LOB %in% lobs) %>% select(.data$trialID, .data$Loss)
     losses$layered_loss <-
