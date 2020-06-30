@@ -7,7 +7,7 @@
 portfolio(...)
 }
 \arguments{
-\item{...}{layers in the portfolio}
+\item{...}{layers or portfolios (a portfolio can be an argument to portfolio)}
 }
 \value{
 The portfolio object.

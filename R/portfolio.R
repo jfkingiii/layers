@@ -9,21 +9,21 @@ explode <- function(L){
 # Need a slot in the layer object for sign (+ or -) ??
 
 #' Create a portfolio object.
-#' @param ... layers in the portfolio
+#' @param ... layers or portfolios (a portfolio can be an argument to portfolio)
 #' @return The portfolio object.
 #' @export
 portfolio <- function(...) {
-  layer_list <- list(...)
-  # make sure all the arguments are layers
-  # TODO change portfolio so that a portfolio can be an argument
+  arg_list <- list(...)
+  # make sure all the arguments are layers or portfolios
+  # A portfolio can be an argument to portfolio
   # e.g. net = portfolio(gross, minus(ceded))
-  stopifnot(is.list(layer_list),
-            all(sapply(layer_list, function(x)
+  stopifnot(is.list(arg_list),
+            all(sapply(arg_list, function(x)
               class(x) %in% c("layer", "portfolio"))))
-  layer_ind <- sapply(layer_list, is, "layer")
+  layer_ind <- sapply(arg_list, is, "layer")
   port_ind <- !layer_ind
-  port_list <- layer_list[port_ind]
-  layer_list <- c(layer_list[layer_ind], explode(port_list))
+  port_list <- arg_list[port_ind]
+  layer_list <- c(arg_list[layer_ind], explode(port_list))
   # Test that the loss sets are the same for every layer
   lsnames <- unique(sapply(layer_list, function(x) x$loss_set))
   stopifnot(length(lsnames) == 1)
@@ -75,7 +75,7 @@ stdev.portfolio <- function(object){
 
 
 #' @rdname minus
-#' @export minus.layer
+#' @export minus.portfolio
 #' @export
 minus.portfolio <- function(object){
   minus_list <- lapply(object$layer_list, minus)

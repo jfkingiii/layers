@@ -1,7 +1,3 @@
-library(layers)
-
-print("running test")
-
 test_layer <- layer(4000000, 1000000, 1, "yelt_test", lobs=c("PHYSICIANS","CHC","MEDCHOICE"))
 gross_layer <- layer(UNLIMITED, 0, 1, "yelt_test", lobs=c("PHYSICIANS","CHC","MEDCHOICE","HOSPITAL"))
 agg_layer <- layer(4000000, 1000000, 1, "yelt_test", lobs=c("PHYSICIANS","CHC","MEDCHOICE"),
@@ -151,5 +147,15 @@ test_that("Portfolio VaR and tVaR work", {
   expect_equal(round(tVaR(P, 25)), 28647315)
 })
 
+test_that("Nested portfolios work", {
+  gross <- portfolio(gross_layer)
+  ceded <- portfolio(layer1, layer2, layer3)
+  net <- portfolio(gross, minus(ceded))
+  expect_equal(expected(net), expected(gross) - expected(ceded))
+  expect_equal(
+    expected(net),
+    expected(gross_layer) - expected(layer1) - expected(layer2) - expected(layer3)
+  )
+})
 
-print("test complete")
+

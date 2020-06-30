@@ -14,8 +14,8 @@ coverage](https://codecov.io/gh/jfkingiii/layers/branch/master/graph/badge.svg)]
 [![Version](https://img.shields.io/github/v/tag/jfkingiii/layers?label=Version)](https://github.com/jfkingiii/layers/tags)
 <!-- badges: end -->
 
-Layers provides a simple library for doing common reinsurance
-calculations outside of Analyze Re.
+The `layers` package provides a simple library for doing common
+reinsurance calculations outside of Analyze Re.
 
 ## Installation
 
@@ -45,6 +45,7 @@ test_layer <- layer(4000000, 1000000, 1, "yelt_test",
 gross_layer <- layer(UNLIMITED, 0, 1, "yelt_test",
                      lobs=c("PHYSICIANS", "CHC", "MEDCHOICE", "HOSPITAL"))
 # Aggregate limits and deductibles are optional and default to UNLIMITED and 0.
+
 test_layer
 #>                                   Value
 #> Limit:                        4,000,000
@@ -52,7 +53,6 @@ test_layer
 #> Participation:                    1.000
 #> Loss set:                     yelt_test
 #> LOBs:          PHYSICIANS CHC MEDCHOICE
-
 gross_layer
 #>                                            Value
 #> Limit:                                 UNLIMITED
@@ -60,7 +60,6 @@ gross_layer
 #> Participation:                             1.000
 #> Loss set:                              yelt_test
 #> LOBs:          PHYSICIANS CHC MEDCHOICE HOSPITAL
-
 summary(test_layer)
 #>                                   Value
 #> Limit:                        4,000,000
@@ -78,7 +77,6 @@ summary(test_layer)
 #> tVaR 25:  15,582,691
 #> tVaR 100: 17,798,589
 #> tVaR 250: 19,018,259
-
 summary(gross_layer)
 #>                                            Value
 #> Limit:                                 UNLIMITED
@@ -141,4 +139,12 @@ expected(layer1) + expected(layer2) + expected(layer3)
 #> [1] 19472924
 expected(P)
 #> [1] 19472924
+
+# Use a portfolio as an argument to portfolio
+ceded <- portfolio(layer1, layer2, layer3)
+net <- portfolio(gross_layer, minus(ceded))
+expected(gross_layer) - expected(ceded)
+#> [1] 82762300
+expected(net)
+#> [1] 82762300
 ```

@@ -4,7 +4,7 @@
 \alias{minus}
 \alias{minus.layer}
 \alias{minus.portfolio}
-\title{Change the sign of the losses in a layer.}
+\title{Change the sign of the losses in a layer or portfolio.}
 \usage{
 minus(object)
 
@@ -16,7 +16,7 @@ minus(object)
 \item{object}{the layer to change the sign of}
 }
 \description{
-Change the sign of the losses in a layer.
+Change the sign of the losses in a layer or portfolio.
 }
 \examples{
 test_layer <- layer(4000000, 1000000, 1, "yelt_test", lobs=c("PHYSICIANS","CHC","MEDCHOICE"))

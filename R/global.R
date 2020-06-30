@@ -39,7 +39,7 @@ expected <- function(object) UseMethod("expected")
 #' @export
 stdev <- function(object) UseMethod("stdev")
 
-#' Change the sign of the losses in a layer.
+#' Change the sign of the losses in a layer or portfolio.
 #' @param object the layer to change the sign of
 #' @examples
 #' test_layer <- layer(4000000, 1000000, 1, "yelt_test", lobs=c("PHYSICIANS","CHC","MEDCHOICE"))
