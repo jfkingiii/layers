@@ -32,9 +32,11 @@ You can install the development version of `layers` from [GitHub](https://github
 # install.packages("devtools")
 devtools::install_github("jfkingiii/layers")
 ```
+If using Windows, Rtools should be installed: https://cran.r-project.org/bin/windows/Rtools/
+
 ## Example
 
-Use the included sample yelt, `yelt_test`, to try out some of the `layers` functions.
+Use the included sample YELT, `yelt_test`, to try out some of the `layers` functions.
 
 ```{r example}
 library(layers)

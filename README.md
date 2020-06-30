@@ -27,6 +27,9 @@ You can install the development version of `layers` from
 devtools::install_github("jfkingiii/layers")
 ```
 
+If using Windows, Rtools should be installed:
+<https://cran.r-project.org/bin/windows/Rtools/>
+
 ## Example
 
 Use the included sample yelt, `yelt_test`, to try out some of the

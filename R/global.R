@@ -75,7 +75,7 @@ VaR <- function(object, rp_years, type = c("AEP", "OEP")) UseMethod("VaR")
 tVaR <- function(object, rp_years, type = c("AEP", "OEP")) UseMethod("tVaR")
 
 
-#' A function to calculate Average Annual Loss (AAL) from a yelt
+#' A function to calculate Average Annual Loss (AAL) from a YELT.
 #' @param yelt The yelt as a data frame or tibble. It must contain columns named trialID, LOB, and Loss
 #' @param all A flag - show each line individually or show a single number for all combined
 #' @examples

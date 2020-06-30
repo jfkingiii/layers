@@ -27,9 +27,8 @@ portfolio <- function(...) {
   # Test that the loss sets are the same for every layer
   lsnames <- unique(sapply(layer_list, function(x) x$loss_set))
   stopifnot(length(lsnames) == 1)
-  trial_results <-
-    lapply(layer_list, function(layer) layer$trial_results) %>%
-    bind_rows()
+  trial_results <- lapply(layer_list, function(layer) layer$trial_results)
+  trial_results <- do.call("rbind", trial_results)
   trial_results <-
     trial_results %>% group_by(.data$trialID) %>% summarise(
       ceded_loss = sum(.data$ceded_loss), .groups = "drop")
@@ -88,7 +87,7 @@ minus.portfolio <- function(object){
 #' @export
 VaR.portfolio <- function(object, rp_years, type = c("AEP", "OEP")) {
   type = match.arg(type)
-  stopifnot(type == "AEP") # OEP not working for portfolios
+  if(type == "OEP") stop("OEP not implemented for portfolios")
   aep_sort <- sort(object$trial_results$ceded_loss, decreasing = TRUE)
   ans <- aep_sort[nrow(object$trial_results) / rp_years]
   return(unname(ans))
@@ -100,7 +99,7 @@ VaR.portfolio <- function(object, rp_years, type = c("AEP", "OEP")) {
 #' @export
 tVaR.portfolio <- function(object, rp_years, type = c("AEP", "OEP")) {
   type = match.arg(type)
-  stopifnot(type == "AEP") # OEP not working for portfolios
+  if(type == "OEP") stop("OEP not implemented for portfolios") # OEP not working for portfolios
   v <- VaR(object = object, rp_years = rp_years, type = type)
   aep <- object$trial_results$ceded_loss
   ans <- mean(aep[aep >= v])

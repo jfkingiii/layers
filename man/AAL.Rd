@@ -2,7 +2,7 @@
 % Please edit documentation in R/global.R
 \name{AAL}
 \alias{AAL}
-\title{A function to calculate Average Annual Loss (AAL) from a yelt}
+\title{A function to calculate Average Annual Loss (AAL) from a YELT.}
 \usage{
 AAL(yelt, all = FALSE)
 }
@@ -12,7 +12,7 @@ AAL(yelt, all = FALSE)
 \item{all}{A flag - show each line individually or show a single number for all combined}
 }
 \description{
-A function to calculate Average Annual Loss (AAL) from a yelt
+A function to calculate Average Annual Loss (AAL) from a YELT.
 }
 \examples{
 AAL(yelt_test)
