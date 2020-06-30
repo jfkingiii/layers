@@ -1,3 +1,13 @@
+#' Explodes a list of porfolios into a list of layers.
+#' @param L the layers to be exploded
+#' @return A list containing all the layers in L
+#' @export
+explode <- function(L){
+  unlist(lapply(L, function(x) x$layer_list), recursive = FALSE)
+}
+
+# Need a slot in the layer object for sign (+ or -) ??
+
 #' Create a portfolio object.
 #' @param ... layers in the portfolio
 #' @return The portfolio object.
@@ -7,8 +17,14 @@ portfolio <- function(...) {
   # make sure all the arguments are layers
   # TODO change portfolio so that a portfolio can be an argument
   # e.g. net = portfolio(gross, minus(ceded))
-  stopifnot(is.list(layer_list), all(sapply(layer_list, is, "layer")))
-  # need a test that the loss sets are the same for every layer
+  stopifnot(is.list(layer_list),
+            all(sapply(layer_list, function(x)
+              class(x) %in% c("layer", "portfolio"))))
+  layer_ind <- sapply(layer_list, is, "layer")
+  port_ind <- !layer_ind
+  port_list <- layer_list[port_ind]
+  layer_list <- c(layer_list[layer_ind], explode(port_list))
+  # Test that the loss sets are the same for every layer
   lsnames <- unique(sapply(layer_list, function(x) x$loss_set))
   stopifnot(length(lsnames) == 1)
   trial_results <-
