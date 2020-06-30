@@ -17,7 +17,7 @@ Imports:
     dplyr,
     methods
 Depends:
-    R (>= 3.5.0)
+    R (>= 3.4.4)
 Suggests:
     testthat,
     covr
