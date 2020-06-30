@@ -73,7 +73,8 @@ print.layer <- function(x, ...) {
   participation <- format(x$participation, nsmall=3, format="f")
   df <- data.frame(
     row.names = c("Limit:", "Attachment:", "Participation:", "Loss set:", "LOBs:"),
-    Value = c(limit, attachment, participation, x$loss_set, paste(x$lobs, collapse=" ")))
+    Value = c(limit, attachment, participation, x$loss_set, paste(x$lobs, collapse=" ")),
+    stringsAsFactors = FALSE)
   if (x$agg_attachment != 0 | x$agg_limit != UNLIMITED)
   {
     agg_attachment <- format(x$agg_attachment, big.mark = ",", scientific = FALSE)
@@ -81,7 +82,8 @@ print.layer <- function(x, ...) {
     df2 <-
       data.frame(
         row.names = c("Agg Attachment:", "Agg Limit:"),
-        Value = c(agg_attachment, agg_limit)
+        Value = c(agg_attachment, agg_limit),
+        stringsAsFactors = FALSE
       )
     df <- rbind(df, df2)
   }
@@ -200,6 +202,7 @@ print.summary.layer <- function(x, ...) {
       "tVaR 100:",
       "tVaR 250:"
     ),
-    Value = z
+    Value = z,
+    stringsAsFactors = FALSE
   ))
 }
