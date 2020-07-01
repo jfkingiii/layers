@@ -109,8 +109,8 @@ test_that("Layer print works", {
   expect_error(print(test_layer), NA)
   expect_error(print(gross_layer), NA)
   expect_error(print(agg_layer), NA)
-  expect_equal(dim(print(agg_layer)), c(7, 1))
-  expect_equal(dim(print(test_layer)), c(5, 1))
+  expect_equal(dim(print(agg_layer)), c(8, 1))
+  expect_equal(dim(print(test_layer)), c(6, 1))
 })
 
 test_that("Portfolio print works", {

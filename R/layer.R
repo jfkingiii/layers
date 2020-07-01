@@ -52,6 +52,9 @@ layer <-
         trial_results = trial_results
       )
     class(value) <- "layer"
+    mn <- min(trial_results$ceded_loss)
+    mx <- max(trial_results$ceded_loss)
+    if (mn < 0 & mx > 0) stop("Mixed signs in layer losses")
     return(value)
   }
 
@@ -71,9 +74,12 @@ print.layer <- function(x, ...) {
   if (x$limit == UNLIMITED) limit <- "UNLIMITED"
   else limit <-  format(x$limit, big.mark = ",", scientific = FALSE)
   participation <- format(x$participation, nsmall=3, format="f")
+  sgn <- min(x$trial_results$ceded_loss)
+  if (sgn >= 1) layer_sign <- "+"
+  else layer_sign <- "-"
   df <- data.frame(
-    row.names = c("Limit:", "Attachment:", "Participation:", "Loss set:", "LOBs:"),
-    Value = c(limit, attachment, participation, x$loss_set, paste(x$lobs, collapse=" ")),
+    row.names = c("Limit:", "Attachment:", "Participation:", "Loss set:", "LOBs:", "Sign:"),
+    Value = c(limit, attachment, participation, x$loss_set, paste(x$lobs, collapse=" "), layer_sign),
     stringsAsFactors = FALSE)
   if (x$agg_attachment != 0 | x$agg_limit != UNLIMITED)
   {

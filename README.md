@@ -32,7 +32,7 @@ If using Windows, Rtools should be installed:
 
 ## Example
 
-Use the included sample yelt, `yelt_test`, to try out some of the
+Use the included sample YELT, `yelt_test`, to try out some of the
 `layers` functions.
 
 ``` r
@@ -56,6 +56,7 @@ test_layer
 #> Participation:                    1.000
 #> Loss set:                     yelt_test
 #> LOBs:          PHYSICIANS CHC MEDCHOICE
+#> Sign:                                 +
 gross_layer
 #>                                            Value
 #> Limit:                                 UNLIMITED
@@ -63,6 +64,7 @@ gross_layer
 #> Participation:                             1.000
 #> Loss set:                              yelt_test
 #> LOBs:          PHYSICIANS CHC MEDCHOICE HOSPITAL
+#> Sign:                                          +
 summary(test_layer)
 #>                                   Value
 #> Limit:                        4,000,000
@@ -70,6 +72,7 @@ summary(test_layer)
 #> Participation:                    1.000
 #> Loss set:                     yelt_test
 #> LOBs:          PHYSICIANS CHC MEDCHOICE
+#> Sign:                                 +
 #> 
 #>                Value
 #> Mean:      6,782,625
@@ -87,6 +90,7 @@ summary(gross_layer)
 #> Participation:                             1.000
 #> Loss set:                              yelt_test
 #> LOBs:          PHYSICIANS CHC MEDCHOICE HOSPITAL
+#> Sign:                                          +
 #> 
 #>                 Value
 #> Mean:     102,235,225
@@ -119,6 +123,7 @@ summary(agg_layer)
 #> Participation:                     1.000
 #> Loss set:                      yelt_test
 #> LOBs:           PHYSICIANS CHC MEDCHOICE
+#> Sign:                                  -
 #> Agg Attachment:                4,000,000
 #> Agg Limit:                    12,000,000
 #> 
@@ -150,4 +155,47 @@ expected(gross_layer) - expected(ceded)
 #> [1] 82762300
 expected(net)
 #> [1] 82762300
+summary(net)
+#>                                            Value
+#> Limit:                                 UNLIMITED
+#> Attachment:                                    0
+#> Participation:                             1.000
+#> Loss set:                              yelt_test
+#> LOBs:          PHYSICIANS CHC MEDCHOICE HOSPITAL
+#> Sign:                                          +
+#> 
+#>                     Value
+#> Limit:            100,000
+#> Attachment:       100,000
+#> Participation:      1.000
+#> Loss set:       yelt_test
+#> LOBs:          PHYSICIANS
+#> Sign:                   -
+#> 
+#>                     Value
+#> Limit:            100,000
+#> Attachment:       200,000
+#> Participation:      1.000
+#> Loss set:       yelt_test
+#> LOBs:          PHYSICIANS
+#> Sign:                   -
+#> 
+#>                     Value
+#> Limit:            100,000
+#> Attachment:       300,000
+#> Participation:      1.000
+#> Loss set:       yelt_test
+#> LOBs:          PHYSICIANS
+#> Sign:                   -
+#> 
+#> 
+#>                 Value
+#> Mean:      82,762,300
+#> StdDev:    14,631,910
+#> VaR 25:   112,527,136
+#> VaR 100:  123,037,841
+#> VaR 250:  128,296,989
+#> tVaR 25:  119,841,123
+#> tVaR 100: 127,537,772
+#> tVaR 250: 131,842,474
 ```
