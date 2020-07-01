@@ -83,4 +83,5 @@ ceded <- portfolio(layer1, layer2, layer3)
 net <- portfolio(gross_layer, minus(ceded))
 expected(gross_layer) - expected(ceded)
 expected(net)
+summary(net)
 ```

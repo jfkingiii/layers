@@ -105,3 +105,67 @@ tVaR.portfolio <- function(object, rp_years, type = c("AEP", "OEP")) {
   ans <- mean(aep[aep >= v])
   return(unname(ans))
 }
+
+
+#' Summarize the portfolio parameters, and compute some metrics
+#' for the portfolio
+#' @param object The portfolio to calculate metrics for.
+#' @param ... Objects to be passed to subsequent methods, if they existed.
+#' @return An object of class summary.portfolio containing layer parameters, mean,
+#' standard deviation, VaR and tVaR (AEP).
+#' @examples
+#' layer1 <- layer(100000, 100000, 1, "yelt_test", lobs="PHYSICIANS")
+#' layer2 <- layer(100000, 200000, 1, "yelt_test", lobs="PHYSICIANS")
+#' layer3 <- layer(100000, 300000, 1, "yelt_test", lobs="PHYSICIANS")
+#' P <- portfolio(layer1, layer2, layer3)
+#' summary(P)
+#' @export summary.portfolio
+#' @export
+summary.portfolio <- function(object, ...) {
+  ans <- list(portfolio = object,
+              mean = expected(object),
+              sd = stdev(object),
+              var25 = VaR(object, 25, "AEP"),
+              var100 = VaR(object, 100, "AEP"),
+              var250 = VaR(object, 250, "AEP"),
+              tvar25 = tVaR(object, 25, "AEP"),
+              tvar100 = tVaR(object, 100, "AEP"),
+              tvar250 = tVaR(object, 250, "AEP")
+  )
+  class(ans) <- "summary.portfolio"
+  return(ans)
+}
+
+
+#' Print function for objects of class summary.portfolio
+#' @param x The summary to be printed.
+#' @param ... Objects to be passed to subsequent methods, if they existed.
+#' @examples
+#' layer1 <- layer(100000, 100000, 1, "yelt_test", lobs="PHYSICIANS")
+#' layer2 <- layer(100000, 200000, 1, "yelt_test", lobs="PHYSICIANS")
+#' layer3 <- layer(100000, 300000, 1, "yelt_test", lobs="PHYSICIANS")
+#' P <- portfolio(layer1, layer2, layer3)
+#' summary(P)
+#' print(summary(P)) # same thing
+#' @export print.summary.portfolio
+#' @export
+print.summary.portfolio <- function(x, ...) {
+  print(x$portfolio)
+  cat("\n")
+  z <- sapply(x[-1], function(y) format(round(y), big.mark = ",", scientific = FALSE))
+  names(z) <- NULL
+  print(data.frame(
+    row.names = c(
+      "Mean:",
+      "StdDev:",
+      "VaR 25:",
+      "VaR 100:",
+      "VaR 250:",
+      "tVaR 25:",
+      "tVaR 100:",
+      "tVaR 250:"
+    ),
+    Value = z,
+    stringsAsFactors = FALSE
+  ))
+}
