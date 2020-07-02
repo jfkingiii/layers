@@ -6,7 +6,6 @@ explode <- function(L){
   unlist(lapply(L, function(x) x$layer_list), recursive = FALSE)
 }
 
-# Need a slot in the layer object for sign (+ or -) ??
 
 #' Create a portfolio object.
 #' @param ... layers or portfolios (a portfolio can be an argument to portfolio)
@@ -29,9 +28,10 @@ portfolio <- function(...) {
   stopifnot(length(lsnames) == 1)
   trial_results <- lapply(layer_list, function(layer) layer$trial_results)
   trial_results <- do.call("rbind", trial_results)
-  trial_results <-
-    trial_results %>% group_by(.data$trialID) %>% summarise(
-      ceded_loss = sum(.data$ceded_loss), .groups = "drop")
+  # trial_results <-
+  #   trial_results %>% group_by(.data$trialID) %>% summarise(
+  #     ceded_loss = sum(.data$ceded_loss), .groups = "drop")
+  trial_results <- aggregate(trial_results["ceded_loss"], trial_results["trialID"], sum)
   ans <- list(layer_list = layer_list, trial_results = trial_results)
   class(ans) <- "portfolio"
   return(ans)
@@ -47,7 +47,6 @@ portfolio <- function(...) {
 #' P <- portfolio(layer1, layer2)
 #' P
 #' print(P)
-#' @export print.portfolio
 #' @export
 print.portfolio <- function(x, ...) {
   for (layer in x$layer_list) {
@@ -58,14 +57,12 @@ print.portfolio <- function(x, ...) {
 
 
 #' @rdname expected
-#' @export expected.portfolio
 #' @export
 expected.portfolio <- function(object)
   return(mean(object$trial_results$ceded_loss))
 
 
 #' @rdname stdev
-#' @export stdev.portfolio
 #' @export
 stdev.portfolio <- function(object){
   #return(sd(trials$ceded_loss))
@@ -74,7 +71,6 @@ stdev.portfolio <- function(object){
 
 
 #' @rdname minus
-#' @export minus.portfolio
 #' @export
 minus.portfolio <- function(object){
   minus_list <- lapply(object$layer_list, minus)
@@ -83,7 +79,6 @@ minus.portfolio <- function(object){
 
 
 #' @rdname VaR
-#' @export VaR.portfolio
 #' @export
 VaR.portfolio <- function(object, rp_years, type = c("AEP", "OEP")) {
   type = match.arg(type)
@@ -95,7 +90,6 @@ VaR.portfolio <- function(object, rp_years, type = c("AEP", "OEP")) {
 
 
 #' @rdname tVaR
-#' @export tVaR.portfolio
 #' @export
 tVaR.portfolio <- function(object, rp_years, type = c("AEP", "OEP")) {
   type = match.arg(type)
@@ -119,7 +113,6 @@ tVaR.portfolio <- function(object, rp_years, type = c("AEP", "OEP")) {
 #' layer3 <- layer(100000, 300000, 1, "yelt_test", lobs="PHYSICIANS")
 #' P <- portfolio(layer1, layer2, layer3)
 #' summary(P)
-#' @export summary.portfolio
 #' @export
 summary.portfolio <- function(object, ...) {
   ans <- list(portfolio = object,
@@ -147,7 +140,6 @@ summary.portfolio <- function(object, ...) {
 #' P <- portfolio(layer1, layer2, layer3)
 #' summary(P)
 #' print(summary(P)) # same thing
-#' @export print.summary.portfolio
 #' @export
 print.summary.portfolio <- function(x, ...) {
   print(x$portfolio)

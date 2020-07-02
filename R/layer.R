@@ -26,17 +26,21 @@ layer <-
     stopifnot(all(c("LOB", "trialID", "Loss") %in% names(get(loss_set))))
     valid_lobs <- unique(get(loss_set)$LOB)
     stopifnot(all(lobs %in% valid_lobs))
-    # Layer object will store the trial_results data
-    losses <-
-      get(loss_set) %>% filter(.data$LOB %in% lobs) %>% select(.data$trialID, .data$Loss)
+    losses <- get(loss_set)
+    losses <- losses[losses$LOB %in% lobs, c("trialID", "Loss")]
     losses$layered_loss <-
       pmin(pmax(losses$Loss - attachment, 0), limit)
-    trial_results <-
-      losses %>% group_by(.data$trialID) %>% summarise(
-        ceded_loss = sum(.data$layered_loss),
-        max_ceded_loss = max(.data$layered_loss),
-        .groups = "drop"
-      )
+    # trial_results <-
+    #   losses %>% group_by(.data$trialID) %>% summarise(
+    #     ceded_loss = sum(.data$layered_loss),
+    #     max_ceded_loss = max(.data$layered_loss),
+    #     .groups = "drop"
+    #   )
+    trial_results <- aggregate(losses["layered_loss"],
+                               losses["trialID"],
+                               function(x) c(sum(x), max(x)))
+    trial_results <- as.data.frame(as.matrix(trial_results), stringsAsFactors = FALSE)
+    names(trial_results) <- c("trialID", "ceded_loss", "max_ceded_loss")
     trial_results$ceded_loss <-
       pmin(pmax(trial_results$ceded_loss - agg_attachment, 0),
            agg_limit) * participation
@@ -66,7 +70,6 @@ layer <-
 #' test_layer <- layer(4000000, 1000000, 1, "yelt_test", lobs=c("PHYSICIANS","CHC","MEDCHOICE"))
 #' test_layer
 #' print(test_layer)
-#' @export print.layer
 #' @export
 print.layer <- function(x, ...) {
   # fix this to handle agg limit and agg deductible correctly
@@ -98,21 +101,19 @@ print.layer <- function(x, ...) {
 
 
 #' @rdname expected
-#' @export expected.layer
 #' @export
 expected.layer <- function(object)
 # TODO what if some of the trials have no losses? then this mean will not work
     return(mean(object$trial_results$ceded_loss))
 
+
 #' @rdname stdev
-#' @export stdev.layer
 #' @export
 stdev.layer <- function(object)
     return(sd(object$trial_results$ceded_loss))
 
 
 #' @rdname minus
-#' @export minus.layer
 #' @export
 minus.layer <- function(object){
   object$trial_results$ceded_loss <- (-object$trial_results$ceded_loss)
@@ -122,7 +123,6 @@ minus.layer <- function(object){
 
 
 #' @rdname VaR
-#' @export VaR.layer
 #' @export
 VaR.layer <- function(object, rp_years, type = c("AEP", "OEP")) {
   type = match.arg(type)
@@ -138,8 +138,8 @@ VaR.layer <- function(object, rp_years, type = c("AEP", "OEP")) {
 }
 
 
+
 #' @rdname tVaR
-#' @export tVaR.layer
 #' @export
 tVaR.layer <- function(object, rp_years, type = c("AEP", "OEP")) {
   type = match.arg(type)
@@ -165,7 +165,6 @@ tVaR.layer <- function(object, rp_years, type = c("AEP", "OEP")) {
 #' @examples
 #' test_layer <- layer(4000000, 1000000, 1, "yelt_test", lobs=c("PHYSICIANS","CHC","MEDCHOICE"))
 #' summary(test_layer)
-#' @export summary.layer
 #' @export
 summary.layer <- function(object, ...) {
   ans <- list(layer = object,
@@ -190,7 +189,6 @@ summary.layer <- function(object, ...) {
 #' test_layer <- layer(4000000, 1000000, 1, "yelt_test", lobs=c("PHYSICIANS","CHC","MEDCHOICE"))
 #' summary(test_layer)
 #' print(summary(test_layer)) # same thing
-#' @export print.summary.layer
 #' @export
 print.summary.layer <- function(x, ...) {
   print(x$layer)

@@ -1,5 +1,4 @@
-#' @import dplyr
-#' @importFrom stats quantile sd
+#' @importFrom stats quantile sd aggregate
 #' @importFrom methods is
 NULL
 
@@ -23,7 +22,7 @@ NULL
 UNLIMITED <- .Machine$double.xmax
 
 
-#' Compute the expected losses ceded to the layer.
+#' Compute the expected losses ceded to the layer or portfolio.
 #' @param object the layer or portfolio to compute the expectation of
 #' @examples
 #' test_layer <- layer(4000000, 1000000, 1, "yelt_test", lobs=c("PHYSICIANS","CHC","MEDCHOICE"))
@@ -39,6 +38,7 @@ expected <- function(object) UseMethod("expected")
 #' stdev(test_layer)
 #' @export
 stdev <- function(object) UseMethod("stdev")
+
 
 #' Change the sign of the losses in a layer or portfolio.
 #' @param object the layer to change the sign of
@@ -84,8 +84,7 @@ tVaR <- function(object, rp_years, type = c("AEP", "OEP")) UseMethod("tVaR")
 AAL <- function(yelt, all=FALSE) {
   stopifnot(all(c("trialID", "LOB", "Loss") %in% names(yelt)))
   n_trials <- length(unique(yelt$trialID))
-  ans <- yelt %>% group_by(.data$LOB) %>%
-    summarise(loss = sum(.data$Loss)/n_trials, .groups = "drop")
-  if (all) ans <- sum(ans$loss)
+  ans <- rowsum(yelt["Loss"], yelt$LOB)/n_trials
+  if (all) ans <- sum(ans)
   return(ans)
 }

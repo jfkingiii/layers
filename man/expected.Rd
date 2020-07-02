@@ -4,7 +4,7 @@
 \alias{expected}
 \alias{expected.layer}
 \alias{expected.portfolio}
-\title{Compute the expected losses ceded to the layer.}
+\title{Compute the expected losses ceded to the layer or portfolio.}
 \usage{
 expected(object)
 
@@ -16,7 +16,7 @@ expected(object)
 \item{object}{the layer or portfolio to compute the expectation of}
 }
 \description{
-Compute the expected losses ceded to the layer.
+Compute the expected losses ceded to the layer or portfolio.
 }
 \examples{
 test_layer <- layer(4000000, 1000000, 1, "yelt_test", lobs=c("PHYSICIANS","CHC","MEDCHOICE"))
