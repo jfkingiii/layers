@@ -41,6 +41,14 @@ library(layers)
 # Look at the help files
 help(package = layers)
 
+# Look at the AAL by line
+AAL(yelt_test)
+#>                Loss
+#> CHC         4872434
+#> HOSPITAL   31243978
+#> MEDCHOICE  15236345
+#> PHYSICIANS 50882467
+
 # Create some layers and get their metrics
 options(scipen = 999)
 test_layer <- layer(4000000, 1000000, 1, "yelt_test",

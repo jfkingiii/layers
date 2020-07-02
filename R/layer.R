@@ -20,26 +20,21 @@ layer <-
            lobs,
            agg_attachment = 0,
            agg_limit = UNLIMITED) {
-    # References to .data in dplyr constructions are to avoid
-    # "no visible binding for global variable" note when running BUILD check to check the package
     # The loss set is expected to have columns named LOB, trialID, and Loss
     stopifnot(all(c("LOB", "trialID", "Loss") %in% names(get(loss_set))))
     valid_lobs <- unique(get(loss_set)$LOB)
     stopifnot(all(lobs %in% valid_lobs))
     losses <- get(loss_set)
     losses <- losses[losses$LOB %in% lobs, c("trialID", "Loss")]
-    losses$layered_loss <-
-      pmin(pmax(losses$Loss - attachment, 0), limit)
-    # trial_results <-
-    #   losses %>% group_by(.data$trialID) %>% summarise(
-    #     ceded_loss = sum(.data$layered_loss),
-    #     max_ceded_loss = max(.data$layered_loss),
-    #     .groups = "drop"
-    #   )
+    losses$layered_loss <- pmin(pmax(losses$Loss - attachment, 0), limit)
+    # Use aggregate to compute total layered loss and max layered loss
     trial_results <- aggregate(losses["layered_loss"],
                                losses["trialID"],
                                function(x) c(sum(x), max(x)))
+    # The sum and the max are a vector in the last column of the dataframe.
+    # Fix it so sum and max are in separate columns
     trial_results <- as.data.frame(as.matrix(trial_results), stringsAsFactors = FALSE)
+    # Get the right names on the columns
     names(trial_results) <- c("trialID", "ceded_loss", "max_ceded_loss")
     trial_results$ceded_loss <-
       pmin(pmax(trial_results$ceded_loss - agg_attachment, 0),
@@ -63,6 +58,7 @@ layer <-
   }
 
 
+# TODO: Why is the sign of the layer computed in the print method? Would it be better in the constructor?
 #' Print function for objects of class layer.
 #' @param x The layer to be printed.
 #' @param ... Objects to be passed to subsequent methods, if they existed.
@@ -72,7 +68,7 @@ layer <-
 #' print(test_layer)
 #' @export
 print.layer <- function(x, ...) {
-  # fix this to handle agg limit and agg deductible correctly
+  # TODO fix this to show sign after agg limit and agg deductible
   attachment <- format(x$attachment, big.mark = ",", scientific = FALSE)
   if (x$limit == UNLIMITED) limit <- "UNLIMITED"
   else limit <-  format(x$limit, big.mark = ",", scientific = FALSE)

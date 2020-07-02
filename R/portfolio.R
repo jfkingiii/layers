@@ -28,9 +28,6 @@ portfolio <- function(...) {
   stopifnot(length(lsnames) == 1)
   trial_results <- lapply(layer_list, function(layer) layer$trial_results)
   trial_results <- do.call("rbind", trial_results)
-  # trial_results <-
-  #   trial_results %>% group_by(.data$trialID) %>% summarise(
-  #     ceded_loss = sum(.data$ceded_loss), .groups = "drop")
   trial_results <- aggregate(trial_results["ceded_loss"], trial_results["trialID"], sum)
   ans <- list(layer_list = layer_list, trial_results = trial_results)
   class(ans) <- "portfolio"

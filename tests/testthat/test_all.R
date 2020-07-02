@@ -118,6 +118,16 @@ test_that("Portfolio print works", {
   expect_invisible(print(P))
 })
 
+test_that("summary.portfolio works", {
+  expect_equal(round(summary(P)$mean), 19472924)
+  expect_equal(round(summary(P)$sd), 3770158)
+})
+
+test_that("print.summary.portfolio works", {
+  expect_error(print(summary(P)), NA)
+  expect_invisible(print(summary(P)))
+})
+
 test_that("print.summary.layer works", {
   s <- summary(layer1)
   expect_invisible(print(s))
