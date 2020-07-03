@@ -14,7 +14,6 @@ LazyData: true
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.1.0
 Imports:
-    dplyr,
     methods
 Depends:
     R (>= 3.2.0)
