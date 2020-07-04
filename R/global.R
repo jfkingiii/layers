@@ -3,16 +3,24 @@
 NULL
 
 
-#' A sample YELT (year event loss table) to test layers functions on
-#'
+#' A sample YELT (year event loss table) to test layers functions on.
+#' A YELT dataframe must have attributes for trial_count and lobs.
 #' @format A data frame with 127648 rows and 5 variables:
 #' \describe{
 #'   \item{trialID}{Identifier for the trial, which represents one year}
 #'   \item{LOB}{Line of business or other segmentation}
 #'   \item{Loss}{Loss amount}
 #'   \item{Sequence}{Sequence of loss within trial}
-#'
 #' }
+#' @details # Attributes
+#'   num_trials\cr\cr
+#'   \verb{    }The number of trials\cr\cr
+#'   lobs\cr\cr
+#'   \verb{    }The lines of business\cr
+#' @examples
+#' aggregate(yelt_test["Loss"], yelt_test["LOB"], sum)
+#' attributes(yelt_test)
+#' attributes(yelt_test)[c("lobs", "trial_count")]
 "yelt_test"
 
 
