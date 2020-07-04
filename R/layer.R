@@ -17,13 +17,14 @@ layer <-
            attachment,
            participation = 1,
            loss_set,
-           lobs,
+           lobs = NULL,
            agg_attachment = 0,
            agg_limit = UNLIMITED) {
     # The loss set is expected to have columns named LOB, trialID, and Loss
     stopifnot(all(c("LOB", "trialID", "Loss") %in% names(get(loss_set))))
     valid_lobs <- unique(get(loss_set)$LOB)
     stopifnot(all(lobs %in% valid_lobs))
+    if (is.null(lobs)) lobs <- valid_lobs
     losses <- get(loss_set)
     losses <- losses[losses$LOB %in% lobs, c("trialID", "Loss")]
     losses$layered_loss <- pmin(pmax(losses$Loss - attachment, 0), limit)
@@ -68,17 +69,13 @@ layer <-
 #' print(test_layer)
 #' @export
 print.layer <- function(x, ...) {
-  # TODO fix this to show sign after agg limit and agg deductible
   attachment <- format(x$attachment, big.mark = ",", scientific = FALSE)
   if (x$limit == UNLIMITED) limit <- "UNLIMITED"
   else limit <-  format(x$limit, big.mark = ",", scientific = FALSE)
   participation <- format(x$participation, nsmall=3, format="f")
-  sgn <- min(x$trial_results$ceded_loss)
-  if (sgn >= 1) layer_sign <- "+"
-  else layer_sign <- "-"
   df <- data.frame(
-    row.names = c("Limit:", "Attachment:", "Participation:", "Loss set:", "LOBs:", "Sign:"),
-    Value = c(limit, attachment, participation, x$loss_set, paste(x$lobs, collapse=" "), layer_sign),
+    row.names = c("Limit:", "Attachment:", "Participation:", "Loss set:", "LOBS:"),
+    Value = c(limit, attachment, participation, x$loss_set, paste(x$lobs, collapse=" ")),
     stringsAsFactors = FALSE)
   if (x$agg_attachment != 0 | x$agg_limit != UNLIMITED)
   {
@@ -92,6 +89,14 @@ print.layer <- function(x, ...) {
       )
     df <- rbind(df, df2)
   }
+  sgn <- min(x$trial_results$ceded_loss)
+  if (sgn >= 1) layer_sign <- "+"
+  else layer_sign <- "-"
+  df3 <-
+    data.frame(row.names = "Sign:",
+               Value = layer_sign,
+               stringsAsFactors = FALSE)
+  df <- rbind(df, df3)
   print(df)
 }
 

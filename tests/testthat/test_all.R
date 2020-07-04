@@ -94,6 +94,9 @@ test_that("The layer constructor works", {
   ceded2 <- sum(pmin(pmax(x - layer2$attachment, 0), layer2$limit))
   expect_equal(ceded1, ceded2)
   expect_equal(nrow(layer2$trial_results), length(unique(ls$trialID)))
+  # test default value for lobs
+  all_lines_layer <- layer(100000, 100000, 1, "yelt_test")
+  expect_equal(all_lines_layer$lobs, c("MEDCHOICE", "PHYSICIANS", "CHC", "HOSPITAL"))
 })
 
 test_that("The portfolio constructor works", {
@@ -169,4 +172,9 @@ test_that("Nested portfolios work", {
   )
 })
 
+test_that("print.layer works", {
+   expect_invisible(print(layer1))
+   expect(print(layer1)["Sign:",] %in% c("+", "-"), "invalid layer sign")
+   expect_equal(dim(print(agg_layer)), c(8, 1))
+})
 

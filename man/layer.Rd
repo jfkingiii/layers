@@ -9,7 +9,7 @@ layer(
   attachment,
   participation = 1,
   loss_set,
-  lobs,
+  lobs = NULL,
   agg_attachment = 0,
   agg_limit = UNLIMITED
 )
