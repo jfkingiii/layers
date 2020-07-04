@@ -22,10 +22,16 @@ layer <-
            agg_limit = UNLIMITED) {
     # The loss set is expected to have columns named LOB, trialID, and Loss
     stopifnot(all(c("LOB", "trialID", "Loss") %in% names(get(loss_set))))
-    valid_lobs <- unique(get(loss_set)$LOB)
-    stopifnot(all(lobs %in% valid_lobs))
-    if (is.null(lobs)) lobs <- valid_lobs
     losses <- get(loss_set)
+    trial_count <- attr(losses, "trial_count")
+    all_lobs <- attr(losses, "lobs")
+    if (is.null(trial_count) |
+        is.null(all_lobs))
+      stop ("Loss set must have attributes lobs and trial_count")
+    valid_lobs <- unique(losses$LOB)
+    stopifnot(all(valid_lobs %in% all_lobs))
+    stopifnot(all(lobs %in% all_lobs))
+    if (is.null(lobs)) lobs <- valid_lobs
     losses <- losses[losses$LOB %in% lobs, c("trialID", "Loss")]
     losses$layered_loss <- pmin(pmax(losses$Loss - attachment, 0), limit)
     # Use aggregate to compute total layered loss and max layered loss
@@ -49,7 +55,9 @@ layer <-
         lobs = lobs,
         agg_attachment = agg_attachment,
         agg_limit = agg_limit,
-        trial_results = trial_results
+        trial_results = trial_results,
+        trial_count = trial_count,
+        all_lobs = all_lobs
       )
     class(value) <- "layer"
     mn <- min(trial_results$ceded_loss)
@@ -105,7 +113,7 @@ print.layer <- function(x, ...) {
 #' @export
 expected.layer <- function(object)
 # TODO what if some of the trials have no losses? then this mean will not work
-    return(mean(object$trial_results$ceded_loss))
+    return(sum(object$trial_results$ceded_loss)/object$trial_count)
 
 
 #' @rdname stdev
