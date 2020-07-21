@@ -118,8 +118,13 @@ expected.layer <- function(object)
 
 #' @rdname stdev
 #' @export
-stdev.layer <- function(object)
-    return(sd(object$trial_results$ceded_loss))
+stdev.layer <- function(object) {
+  obs <- object$trial_results$ceded_loss
+  mu <- expected(object)
+  N <- object$trial_count
+  ans <- sqrt(sum((obs - mu)**2)/(N - 1))
+  return(ans)
+}
 
 
 #' @rdname minus
@@ -135,13 +140,14 @@ minus.layer <- function(object){
 #' @export
 VaR.layer <- function(object, rp_years, type = c("AEP", "OEP")) {
   type = match.arg(type)
+  n <- round(object$trial_count/rp_years)
   if (type == "AEP") {
     aep_sort <- sort(object$trial_results$ceded_loss, decreasing = TRUE)
-    ans <- aep_sort[nrow(object$trial_results)/rp_years]
+    ans <- aep_sort[n]
   }
   else if (type == "OEP") {
     oep_sort <- sort(object$trial_results$max_ceded_loss, decreasing = TRUE)
-    ans <- oep_sort[nrow(object$trial_results)/rp_years]
+    ans <- oep_sort[n]
   }
   return(unname(ans))
 }

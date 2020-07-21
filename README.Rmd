@@ -54,6 +54,8 @@ test_layer <- layer(4000000, 1000000, 1, "yelt_test",
 gross_layer <- layer(UNLIMITED, 0, 1, "yelt_test",
                      lobs=c("PHYSICIANS", "CHC", "MEDCHOICE", "HOSPITAL"))
 # Aggregate limits and deductibles are optional and default to UNLIMITED and 0.
+# Notice the `Sign` value which can be changed using the `minus` function.
+# This allows combining layers by adding and subtracting when building portfolios.
 
 test_layer
 gross_layer

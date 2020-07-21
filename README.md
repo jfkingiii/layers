@@ -56,6 +56,8 @@ test_layer <- layer(4000000, 1000000, 1, "yelt_test",
 gross_layer <- layer(UNLIMITED, 0, 1, "yelt_test",
                      lobs=c("PHYSICIANS", "CHC", "MEDCHOICE", "HOSPITAL"))
 # Aggregate limits and deductibles are optional and default to UNLIMITED and 0.
+# Notice the `Sign` value which can be changed using the `minus` function.
+# This allows combining layers by adding and subtracting when building portfolios.
 
 test_layer
 #>                                   Value
@@ -63,7 +65,7 @@ test_layer
 #> Attachment:                   1,000,000
 #> Participation:                    1.000
 #> Loss set:                     yelt_test
-#> LOBs:          PHYSICIANS CHC MEDCHOICE
+#> LOBS:          PHYSICIANS CHC MEDCHOICE
 #> Sign:                                 +
 gross_layer
 #>                                            Value
@@ -71,7 +73,7 @@ gross_layer
 #> Attachment:                                    0
 #> Participation:                             1.000
 #> Loss set:                              yelt_test
-#> LOBs:          PHYSICIANS CHC MEDCHOICE HOSPITAL
+#> LOBS:          PHYSICIANS CHC MEDCHOICE HOSPITAL
 #> Sign:                                          +
 summary(test_layer)
 #>                                   Value
@@ -79,7 +81,7 @@ summary(test_layer)
 #> Attachment:                   1,000,000
 #> Participation:                    1.000
 #> Loss set:                     yelt_test
-#> LOBs:          PHYSICIANS CHC MEDCHOICE
+#> LOBS:          PHYSICIANS CHC MEDCHOICE
 #> Sign:                                 +
 #> 
 #>                Value
@@ -97,7 +99,7 @@ summary(gross_layer)
 #> Attachment:                                    0
 #> Participation:                             1.000
 #> Loss set:                              yelt_test
-#> LOBs:          PHYSICIANS CHC MEDCHOICE HOSPITAL
+#> LOBS:          PHYSICIANS CHC MEDCHOICE HOSPITAL
 #> Sign:                                          +
 #> 
 #>                 Value
@@ -130,10 +132,10 @@ summary(agg_layer)
 #> Attachment:                    1,000,000
 #> Participation:                     1.000
 #> Loss set:                      yelt_test
-#> LOBs:           PHYSICIANS CHC MEDCHOICE
-#> Sign:                                  -
+#> LOBS:           PHYSICIANS CHC MEDCHOICE
 #> Agg Attachment:                4,000,000
 #> Agg Limit:                    12,000,000
+#> Sign:                                  -
 #> 
 #>                Value
 #> Mean:      3,037,403
@@ -169,7 +171,7 @@ summary(net)
 #> Attachment:                                    0
 #> Participation:                             1.000
 #> Loss set:                              yelt_test
-#> LOBs:          PHYSICIANS CHC MEDCHOICE HOSPITAL
+#> LOBS:          PHYSICIANS CHC MEDCHOICE HOSPITAL
 #> Sign:                                          +
 #> 
 #>                     Value
@@ -177,7 +179,7 @@ summary(net)
 #> Attachment:       100,000
 #> Participation:      1.000
 #> Loss set:       yelt_test
-#> LOBs:          PHYSICIANS
+#> LOBS:          PHYSICIANS
 #> Sign:                   -
 #> 
 #>                     Value
@@ -185,7 +187,7 @@ summary(net)
 #> Attachment:       200,000
 #> Participation:      1.000
 #> Loss set:       yelt_test
-#> LOBs:          PHYSICIANS
+#> LOBS:          PHYSICIANS
 #> Sign:                   -
 #> 
 #>                     Value
@@ -193,7 +195,7 @@ summary(net)
 #> Attachment:       300,000
 #> Participation:      1.000
 #> Loss set:       yelt_test
-#> LOBs:          PHYSICIANS
+#> LOBS:          PHYSICIANS
 #> Sign:                   -
 #> 
 #> 

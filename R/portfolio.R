@@ -16,6 +16,7 @@ portfolio <- function(...) {
   # make sure all the arguments are layers or portfolios
   # A portfolio can be an argument to portfolio
   # e.g. net = portfolio(gross, minus(ceded))
+  trial_count <- max(sapply(arg_list, function(x) x$trial_count))
   stopifnot(is.list(arg_list),
             all(sapply(arg_list, function(x)
               class(x) %in% c("layer", "portfolio"))))
@@ -29,7 +30,7 @@ portfolio <- function(...) {
   trial_results <- lapply(layer_list, function(layer) layer$trial_results)
   trial_results <- do.call("rbind", trial_results)
   trial_results <- aggregate(trial_results["ceded_loss"], trial_results["trialID"], sum)
-  ans <- list(layer_list = layer_list, trial_results = trial_results)
+  ans <- list(layer_list = layer_list, trial_results = trial_results, trial_count = trial_count)
   class(ans) <- "portfolio"
   return(ans)
 }
@@ -56,14 +57,17 @@ print.portfolio <- function(x, ...) {
 #' @rdname expected
 #' @export
 expected.portfolio <- function(object)
-  return(mean(object$trial_results$ceded_loss))
+  return(sum(object$trial_results$ceded_loss)/object$trial_count)
 
 
 #' @rdname stdev
 #' @export
 stdev.portfolio <- function(object){
-  #return(sd(trials$ceded_loss))
-  return(sd(object$trial_results$ceded_loss))
+    obs <- object$trial_results$ceded_loss
+    mu <- expected(object)
+    N <- object$trial_count
+    ans <- sqrt(sum((obs - mu)**2)/(N - 1))
+    return(ans)
 }
 
 

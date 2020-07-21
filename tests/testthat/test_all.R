@@ -17,6 +17,11 @@ test_that("portfolio errors if layers have different loss sets", {
   expect_error(portfolio(layer2, layer_different))
 })
 
+test_that("metrics for portfolio", {
+  expect_equal(round(expected(P)), 19472924)
+  expect_equal(round(stdev(P)), 3770158)
+})
+
 test_that("yelt_test is OK", {
 expect_equal(nrow(yelt_test), 127648)
 })
